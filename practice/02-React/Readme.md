@@ -1,0 +1,1 @@
+Crear un componente EventList que reciba un array de eventos (mock) como prop y renderice varias EventCard.

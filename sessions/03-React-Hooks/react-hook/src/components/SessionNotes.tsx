@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
+
+import { save } from '../helpers/localStorageHelper';
 import styles from './SessionNotes.module.css';
 
 type SessionNotesProps = {
@@ -7,9 +9,9 @@ type SessionNotesProps = {
 };
 
 export function SessionNotes({ storageKey = 'session-notes' }: SessionNotesProps) {
-  const [notes, setNotes] = useState<string>(storageKey);
+  const [notes, setNotes] = useState<string>('');
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState<boolean>(false);
 
   useEffect(() => {
     if (!isDirty) {
@@ -19,7 +21,8 @@ export function SessionNotes({ storageKey = 'session-notes' }: SessionNotesProps
     const timeout = window.setTimeout(() => {
       setLastSaved(new Date());
       setIsDirty(false);
-    }, 400);
+      save(storageKey, notes);
+    }, 2000);
 
     return () => {
       window.clearTimeout(timeout);

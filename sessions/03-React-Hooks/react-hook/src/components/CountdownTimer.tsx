@@ -9,11 +9,12 @@ type CountdownTimerProps = {
   autoRestart?: boolean;
 };
 
-const pad = (value: number) => value.toString().padStart(2, '0');
+
+const pad = (value: number) => value.toString().padStart (2,'0');
 
 export function CountdownTimer({
   initialSeconds = 1500,
-  label = 'Pomodoro',
+  label = 'pomodoro',
   onFinish,
   autoRestart = false,
 }: CountdownTimerProps) {

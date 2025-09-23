@@ -6,6 +6,8 @@ type MoodTrackerProps = {
   studentName?: string;
 };
 
+
+
 const moods = ['😎 Energizado', '😌 Tranquilo', '🤔 Concentrado', '😴 Cansado', '🔥 Motivado'];
 
 export function MoodTracker({ studentName = 'Estudiante' }: MoodTrackerProps) {
@@ -13,7 +15,11 @@ export function MoodTracker({ studentName = 'Estudiante' }: MoodTrackerProps) {
   const [history, setHistory] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
+  // useEffect(()=>{
+  //   console.log('NO me uses si quieres aprobar')
+  // });
+  useEffect(() => { 
+    // getAPI 
     let active = true;
     const timeout = window.setTimeout(() => {
       if (!active) {
@@ -23,7 +29,7 @@ export function MoodTracker({ studentName = 'Estudiante' }: MoodTrackerProps) {
       const nextMood = moods[Math.floor(Math.random() * moods.length)];
       setCurrentMood(nextMood);
       setIsLoading(false);
-    }, 500);
+    }, 2000);
 
     return () => {
       active = false;

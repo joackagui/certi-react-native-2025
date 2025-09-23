@@ -4,7 +4,7 @@ import './App.css';
 import { CountdownTimer } from './components/CountdownTimer';
 import { MoodTracker } from './components/MoodTracker';
 import { SessionNotes } from './components/SessionNotes';
-
+import { TitleComponent } from './components/Title.module';
 export default function App() {
 
   const handleTimerFinish = useCallback(() => {
@@ -14,15 +14,10 @@ export default function App() {
   return (
     <div className="appContainer">
       <main className="surface">
-        <div className="header">
-          <div>
-            <h1>React Hooks</h1>
-          </div>
-        </div>
-
+        <TitleComponent titleName="React Hooks"/>
         <section className="widgetsGrid">
           <MoodTracker studentName="Paul" />
-          <CountdownTimer initialSeconds={900} label="Enfoque 15 min" onFinish={handleTimerFinish} />
+          <CountdownTimer initialSeconds={400} onFinish={handleTimerFinish} />
           <SessionNotes />
         </section>
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Children, ReactNode, useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -12,13 +12,43 @@ import {
 } from "react-native";
 
 const getGreeting = (): string => {
-
   const hour = new Date().getHours();
   const minutes = new Date().getMinutes();
   if (hour < 6) return `${hour}:${minutes} No molestes`;
   if (hour < 12) return `${hour}:${minutes} Buenos días`;
   if (hour < 18) return `${hour}:${minutes} Buenas tardes`;
   return `${hour}:${minutes} Buenas noches`;
+};
+
+type Skill = {
+  id: string;
+  name: string;
+};
+
+const skills: Skill[] = [
+  { id: "1", name: "JavaScript" },
+  { id: "2", name: "TypeScript" },
+  { id: "3", name: "React" },
+];
+type SectionSkillsProps = {
+  title?: string;
+  description?: string;
+  children: ReactNode;
+};
+const SectionSkills = ({
+  title = "My Section",
+  description = "My Description",
+  children,
+}: SectionSkillsProps) => {
+  return (
+    <View style={styles.section}>
+      <View style={styles.sectionHeader}>
+        <Text style={styles.sectionTitle}>{title}</Text>
+        <Text style={styles.sectionSubTitle}>{description}</Text>
+      </View>
+      {children}
+    </View>
+  );
 };
 
 export default function App() {
@@ -60,6 +90,20 @@ export default function App() {
             <Text style={styles.likeText}>{likesLabel}</Text>
           </TouchableOpacity>
         </View>
+        <SectionSkills
+          title="Habilidades"
+          description="Mis habilidades que dicen que se"
+        >
+          <View style={styles.skillGroup}>
+            {skills.map((skill) => {
+                        return (
+                          <View style={styles.skill}>
+                            <Text style={styles.textSkill}>{skill.name}</Text>
+                          </View>
+                        );
+                      })}
+          </View>
+        </SectionSkills>
       </ScrollView>
     </SafeAreaView>
   );
@@ -70,7 +114,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f8fafc",
   },
-  content: { padding: 20   },
+  content: { padding: 20 },
   header: { marginBottom: 24 },
   greeting: { fontSize: 16, color: "#475569", fontWeight: "600" },
   heroTitle: {
@@ -79,12 +123,12 @@ const styles = StyleSheet.create({
     color: "#0f172a",
     marginTop: 4,
   },
-  heroSubtitle: { 
-    marginTop: 10, 
-    color: "#475569", 
-    lineHeight: 20 
+  heroSubtitle: {
+    marginTop: 10,
+    color: "#475569",
+    lineHeight: 20,
   },
-    card: {
+  card: {
     backgroundColor: "white",
     borderRadius: 24,
     padding: 20,
@@ -93,7 +137,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 4,//  z-index 
+    elevation: 4, //  z-index
     borderWidth: 1,
     borderColor: "#e2e8f0",
   },
@@ -130,6 +174,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 12,
   },
+  section: {
+    marginBottom: 28,
+  },
+  sectionHeader: { marginBottom: 16 },
+  sectionTitle: { fontSize: 20, color: "black", fontWeight: 700 },
+  sectionSubTitle: { fontSize: 14, color: "black", fontWeight: 300 },
+  skillGroup: {
+    flexDirection: 'row',
+    flexWrap: 'wrap'
+  },
+  skill: {
+    paddingHorizontal: 10,
+    backgroundColor: '#2563eb',
+    marginHorizontal: 3,
+    paddingVertical: 4,
+    borderRadius: 15
+  },
+  textSkill: {
+    color: 'white',
+    fontWeight: 600
+  }
 });
-
-

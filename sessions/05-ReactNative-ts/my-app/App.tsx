@@ -1,4 +1,4 @@
-import { Children, ReactNode, useState } from "react";
+import { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -7,10 +7,14 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  ListRenderItem,
   View,
-  Button,
+  FlatList,
+  Task,
 } from "react-native";
 
+import {SectionSkills } from './components/Section';
+import { CardProfile } from './components/CardProfile';
 const getGreeting = (): string => {
   const hour = new Date().getHours();
   const minutes = new Date().getMinutes();
@@ -30,31 +34,104 @@ const skills: Skill[] = [
   { id: "2", name: "TypeScript" },
   { id: "3", name: "React" },
 ];
-type SectionSkillsProps = {
-  title?: string;
-  description?: string;
-  children: ReactNode;
-};
-const SectionSkills = ({
-  title = "My Section",
-  description = "My Description",
-  children,
-}: SectionSkillsProps) => {
+
+type Hobby = {
+  id: string;
+  name: string;
+  icon: string;
+}
+const hobbies: Hobby[] = [
+  {
+    id: "1",
+    name: "Wally",
+    icon:  '😓'
+  }, 
+  {
+    id: "2",
+    name: "Dota 2",
+    icon: '🫅'
+  },
+  {
+    id: '3',
+    name: "Cook",
+    icon: '🤠'
+  },
+  {
+    id: '4',
+    name: "Programacion Competitiva",
+    icon: '🥰'
+  }
+]
+
+const renderHobby:ListRenderItem<Hobby> = ({item}) => {
   return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-        <Text style={styles.sectionSubTitle}>{description}</Text>
-      </View>
-      {children}
+    <View style={styles.hobbyCard}>
+      <Text style={styles.iconText}>{item.icon}</Text>
+      <Text style={styles.nameText}>{item.name}</Text>
     </View>
-  );
+  )
 };
+
+type Task = {
+    id: string;
+    title: string;
+    description: string;
+    completed: boolean;
+}
+
+const tasks: Task[] = [
+  { 
+    id: '1', 
+    title: 'Cocinar',
+    description: 'Elaborar un rico Fricase',
+    completed: false
+  },
+  { 
+    id: '2', 
+    title: 'Ir al Gym',
+    description: 'Rutina de Pierna',
+    completed: false
+  },
+  { 
+    id: '3', 
+    title: 'Acabar la Tarea',
+    description: 'Consultar a Chatgptcito',
+    completed: false
+  },
+
+]
+
+
 
 export default function App() {
-  const [likes, setLikes] = useState(0);
+  const [tasksState, setTasksState] = useState(tasks)
 
-  const likesLabel = `${likes} like${likes === 1 ? "" : "s"}`;
+  const completeTask = (currentTask:Task) => {
+    setTasksState((prev) =>
+      prev.map((task) =>
+        task.id === currentTask.id
+          ? { ...task, completed: true }
+          : task
+      )
+    );
+    console.log(tasksState);
+  }
+  const renderTask:ListRenderItem<Task> = ({item}) => {
+    return (
+    <TouchableOpacity
+      activeOpacity={0.6}
+      onPress={() => completeTask(item)}
+      style={[styles.taskCard, item.completed && styles.taskCompleted]}
+    >
+      <Text style={styles.taskTitle}>
+        {item.title}
+      </Text>
+      <Text style={styles.taskDescription}>
+        {item.description}
+      </Text>
+    </TouchableOpacity>)
+  }
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
@@ -67,29 +144,7 @@ export default function App() {
           </Text>
         </View>
 
-        <View style={styles.card}>
-          <Image
-            source={{ uri: "https://i.pravatar.cc/220?img=2" }}
-            style={styles.avatar}
-          />
-          <View style={styles.cardInfo}>
-            <Text style={styles.cardRole}>
-              React Native Developer en progreso
-            </Text>
-            <Text style={styles.cardMeta}>La Paz · Bolivia 2025</Text>
-          </View>
-
-          {/* <Button title="¡Gracias por tu like!" onPress={() => alert("¡Gracias por tu like!")} /> */}
-
-          <TouchableOpacity
-            activeOpacity={0.9}
-            style={styles.likeButton}
-            onPress={() => setLikes((prev) => prev + 1)}
-          >
-            <Text style={styles.likeEmoji}>🤍</Text>
-            <Text style={styles.likeText}>{likesLabel}</Text>
-          </TouchableOpacity>
-        </View>
+        <CardProfile/>
         <SectionSkills
           title="Habilidades"
           description="Mis habilidades que dicen que se"
@@ -103,6 +158,28 @@ export default function App() {
                         );
                       })}
           </View>
+        </SectionSkills>
+        <SectionSkills 
+          title="Hobbies"
+          description="Mis pasatiempos favoritos"
+        >
+          <FlatList
+            data={hobbies}
+            horizontal
+            renderItem={renderHobby}
+            > 
+          </FlatList>
+        </SectionSkills>
+
+        <SectionSkills 
+          title="Task"
+          description="Mis tareas pendientes"
+        >
+          <FlatList
+            data={tasksState}
+            renderItem={renderTask}
+            > 
+          </FlatList>
         </SectionSkills>
       </ScrollView>
     </SafeAreaView>
@@ -128,58 +205,9 @@ const styles = StyleSheet.create({
     color: "#475569",
     lineHeight: 20,
   },
-  card: {
-    backgroundColor: "white",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 28,
-    shadowColor: "#000",
-    shadowOpacity: 0.2,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 8 },
-    elevation: 4, //  z-index
-    borderWidth: 1,
-    borderColor: "#e2e8f0",
-  },
-  avatar: {
-    width: 92,
-    height: 92,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: "#2563eb",
-    alignSelf: "center",
-  },
-  cardInfo: { marginTop: 16, alignItems: "center" },
-  cardRole: {
-    color: "#1e293b",
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  cardMeta: { marginTop: 4, color: "#64748b" },
-  likeButton: {
-    marginTop: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#2563eb",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-  },
-  likeEmoji: { fontSize: 18 },
-  likeText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 16,
-    marginLeft: 12,
-  },
-  section: {
-    marginBottom: 28,
-  },
-  sectionHeader: { marginBottom: 16 },
-  sectionTitle: { fontSize: 20, color: "black", fontWeight: 700 },
-  sectionSubTitle: { fontSize: 14, color: "black", fontWeight: 300 },
+
+
+  
   skillGroup: {
     flexDirection: 'row',
     flexWrap: 'wrap'
@@ -194,5 +222,44 @@ const styles = StyleSheet.create({
   textSkill: {
     color: 'white',
     fontWeight: 600
+  },
+  hobbyCard: {
+    backgroundColor: 'white',
+    padding: 20,
+    margin: 10,
+    borderRadius: 20,
+    width: 160,
+    height: 120,
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#e2e8f0'   
+  },
+  iconText: {
+    fontSize: 35
+  },
+  nameText: {
+    fontSize: 20,
+    fontWeight: 600,
+    color: '#2929a3ff'
+  },
+  taskCard: {
+    backgroundColor: 'white',
+    borderColor: '#e2e8f0',
+    padding: 20,
+    marginVertical: 15,
+    marginHorizontal: 5,
+    borderRadius: 10,
+    borderWidth: 1
+  },
+  taskTitle: {
+    fontSize: 20, 
+    fontWeight: 600,
+  },
+  taskDescription: {
+    fontSize: 16, 
+    fontWeight: 500
+  },
+  taskCompleted: {
+    backgroundColor: 'green'
   }
 });

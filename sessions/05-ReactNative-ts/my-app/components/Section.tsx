@@ -1,32 +1,25 @@
 import { ReactNode } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-type SectionSkillsProps = {
-  title?: string;
+type SectionProps = {
+  title: string;
   description?: string;
   children: ReactNode;
 };
-export const SectionSkills = ({
-  title = "My Section",
-  description = "My Description",
-  children,
-}: SectionSkillsProps) => {
-  return (
-    <View style={styles.section}>
-      <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{title}</Text>
-        <Text style={styles.sectionSubTitle}>{description}</Text>
-      </View>
-      {children}
+
+export const Section = ({ title, description, children }: SectionProps) => (
+  <View style={styles.container}>
+    <View style={styles.header}>
+      <Text style={styles.title}>{title}</Text>
+      {description ? <Text style={styles.subtitle}>{description}</Text> : null}
     </View>
-  );
-};
+    {children}
+  </View>
+);
 
 const styles = StyleSheet.create({
-  section: {
-    marginBottom: 28,
-  },
-  sectionHeader: { marginBottom: 16 },
-  sectionTitle: { fontSize: 20, color: "black", fontWeight: 700 },
-  sectionSubTitle: { fontSize: 14, color: "black", fontWeight: 300 },
+  container: { marginBottom: 32 },
+  header: { marginBottom: 16 },
+  title: { fontSize: 20, fontWeight: "700", color: "#0f172a" },
+  subtitle: { marginTop: 4, color: "#475569", lineHeight: 20 },
 });

@@ -1,64 +1,58 @@
-import { useState } from "react";
-import { View, TouchableOpacity, Image, Text, StyleSheet } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-export const CardProfile = () => {
-    const [likes, setLikes] = useState(0);
-    const likesLabel = `${likes} like${likes === 1 ? "" : "s"}`;
-  return (
-    <View style={styles.card}>
-      <Image
-        source={{ uri: "https://i.pravatar.cc/220?img=2" }}
-        style={styles.avatar}
-      />
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardRole}>React Native Developer en progreso</Text>
-        <Text style={styles.cardMeta}>La Paz · Bolivia 2025</Text>
-      </View>
-
-      {/* <Button title="¡Gracias por tu like!" onPress={() => alert("¡Gracias por tu like!")} /> */}
-
-      <TouchableOpacity
-        activeOpacity={0.9}
-        style={styles.likeButton}
-        onPress={() => setLikes((prev) => prev + 1)}
-      >
-        <Text style={styles.likeEmoji}>🤍</Text>
-        <Text style={styles.likeText}>{likesLabel}</Text>
-      </TouchableOpacity>
-    </View>
-  );
+export type CardProfileProps = {
+  imageUri: string;
+  role: string;
+  meta: string;
+  likesLabel: string;
+  onLike: () => void;
 };
+
+export const CardProfile = ({
+  imageUri,
+  role,
+  meta,
+  likesLabel,
+  onLike,
+}: CardProfileProps) => (
+  <View style={styles.card}>
+    <Image source={{ uri: imageUri }} style={styles.avatar} />
+    <View style={styles.info}>
+      <Text style={styles.role}>{role}</Text>
+      <Text style={styles.meta}>{meta}</Text>
+    </View>
+    <TouchableOpacity activeOpacity={0.9} style={styles.likeButton} onPress={onLike}>
+      <Text style={styles.likeEmoji}>🤍</Text>
+      <Text style={styles.likeText}>{likesLabel}</Text>
+    </TouchableOpacity>
+  </View>
+);
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
+    backgroundColor: "#ffffff",
     borderRadius: 24,
     padding: 20,
     marginBottom: 28,
-    shadowColor: "#000",
+    shadowColor: "#000000",
     shadowOpacity: 0.2,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 8 },
-    elevation: 4, //  z-index
+    elevation: 4,
     borderWidth: 1,
     borderColor: "#e2e8f0",
   },
   avatar: {
     width: 92,
     height: 92,
-    borderRadius: 50,
+    borderRadius: 46,
     borderWidth: 3,
     borderColor: "#2563eb",
     alignSelf: "center",
   },
-  cardInfo: { marginTop: 16, alignItems: "center" },
-  cardRole: {
-    color: "#1e293b",
-    fontSize: 16,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  cardMeta: { marginTop: 4, color: "#64748b" },
+  info: { marginTop: 16, alignItems: "center" },
+  role: { color: "#1e293b", fontSize: 16, fontWeight: "600", textAlign: "center" },
+  meta: { marginTop: 4, color: "#64748b" },
   likeButton: {
     marginTop: 20,
     flexDirection: "row",
@@ -70,11 +64,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   likeEmoji: { fontSize: 18 },
-  likeText: {
-    color: "#ffffff",
-    fontWeight: "700",
-    fontSize: 16,
-    marginLeft: 12,
-  },
+  likeText: { color: "#ffffff", fontWeight: "700", fontSize: 16, marginLeft: 12 },
 });
-

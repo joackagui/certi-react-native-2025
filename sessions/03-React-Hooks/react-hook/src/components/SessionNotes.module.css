@@ -1,0 +1,39 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.12), rgba(16, 185, 129, 0.08));
+  box-shadow: 0 12px 25px rgba(15, 23, 42, 0.07);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.9rem;
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.header h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+textarea {
+  min-height: 140px;
+  resize: vertical;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  padding: 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+textarea:focus {
+  outline: 2px solid rgba(16, 185, 129, 0.5);
+  outline-offset: 2px;
+}

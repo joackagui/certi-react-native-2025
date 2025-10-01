@@ -1,0 +1,18 @@
+.banner {
+  display: flex;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #312e81;
+  transition: opacity 200ms ease;
+}
+
+.banner[data-state='hidden'] {
+  opacity: 0.75;
+}
+
+.banner[data-state='visible'] {
+  opacity: 1;
+}

@@ -5,7 +5,7 @@
 - Confesiones UPB (ARI VALE ADRIAN)
 - UPB Fitness & Deportes
 - Rutas Gastronómicas – Comida Paceña (TATI PATTY MEL)
-- Turismo La Paz – Descubre tu ciudad
+- Turismo La Paz – Descubre tu ciudad (Diego, Mazen, Fidel)
 - UPB Hub – App de Vida Universitaria ( Cami Joaquin Mariana)
 - Movilidad Universitaria – Transporte UPB
 - Biblioteca Digital UPB

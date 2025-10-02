@@ -12,7 +12,7 @@
 
 #### Enviar Confesión (anonimato)
 
-**Formulario:** texto (min 10, max 500), categoría (Amor/Académico/Random), imagen opcional (URI).
+**Formulario:** texto (min 10, max 500), categoría (Amor/Académico/Random), imagen opcional (Image).
 
 Al enviar, la confesión entra a “Pendientes” (no aparece en el feed hasta aprobar).
 

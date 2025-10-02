@@ -20,6 +20,12 @@ const TabsLayout = () => {
           title: "Productos",
         }}
       ></Tabs.Screen>
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: "Configuracion",
+        }}
+      ></Tabs.Screen>
     </Tabs>
   );
 };

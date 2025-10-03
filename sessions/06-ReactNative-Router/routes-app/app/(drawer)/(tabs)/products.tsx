@@ -2,8 +2,8 @@ import React from 'react';
 import { Stack } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { useThemeColors } from '../hooks/useThemeColors';
-import type { ThemeColors } from '../theme/colors';
+import { useThemeColors } from '../../hooks/useThemeColors';
+import type { ThemeColors } from '../../theme/colors';
 
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
@@ -19,6 +19,7 @@ const createStyles = (colors: ThemeColors) =>
       fontWeight: '700',
       color: colors.text,
       marginBottom: 12,
+      textAlign: 'center',
     },
     copy: {
       textAlign: 'center',
@@ -26,15 +27,17 @@ const createStyles = (colors: ThemeColors) =>
     },
   });
 
-export default function ProfileScreen() {
+const ProductsScreen = () => {
   const { colors } = useThemeColors();
   const styles = React.useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: 'Perfil' }} />
-      <Text style={styles.title}>Perfil de usuario</Text>
-      <Text style={styles.copy}>TATA QUISPE.</Text>
+      <Stack.Screen options={{ title: 'Productos' }} />
+      <Text style={styles.title}>Listado de productos</Text>
+      <Text style={styles.copy}>Aquí aparecerán los productos disponibles.</Text>
     </View>
   );
-}
+};
+
+export default ProductsScreen;

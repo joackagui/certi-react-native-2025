@@ -6,6 +6,32 @@ import { useThemeColors } from '../../hooks/useThemeColors';
 import { useThemeStore } from '../../store/useThemeStore';
 import type { ThemeColors } from '../../theme/colors';
 
+const SettingsScreen = () => {
+  const { theme, colors } = useThemeColors();
+  const toggleTheme = useThemeStore((state) => state.toggleTheme);
+  const styles = React.useMemo(() => createStyles(colors), [colors]);
+
+  return (
+    <View style={styles.container}>
+      <Stack.Screen options={{ title: 'Configuración' }} />
+      <Text style={styles.title}>Configuraciones</Text>
+      <View style={styles.preferenceRow}>
+        <Text style={styles.preferenceLabel}>Modo oscuro</Text>
+        <Switch
+          value={theme === 'dark'}
+          onValueChange={toggleTheme}
+          trackColor={{ false: colors.switchTrackOff, true: colors.switchTrackOn }}
+          thumbColor={theme === 'dark' ? colors.switchThumb : '#f4f4f5'}
+        />
+      </View>
+      <Text style={styles.helperText}>
+        Activa el modo oscuro para reducir el brillo y descansar la vista.
+      </Text>
+    </View>
+  );
+};
+
+
 const createStyles = (colors: ThemeColors) =>
   StyleSheet.create({
     container: {
@@ -44,29 +70,4 @@ const createStyles = (colors: ThemeColors) =>
     },
   });
 
-const SettingsScreen = () => {
-  const { theme, colors } = useThemeColors();
-  const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  const styles = React.useMemo(() => createStyles(colors), [colors]);
-
-  return (
-    <View style={styles.container}>
-      <Stack.Screen options={{ title: 'Configuración' }} />
-      <Text style={styles.title}>Configuraciones</Text>
-      <View style={styles.preferenceRow}>
-        <Text style={styles.preferenceLabel}>Modo oscuro</Text>
-        <Switch
-          value={theme === 'dark'}
-          onValueChange={toggleTheme}
-          trackColor={{ false: colors.switchTrackOff, true: colors.switchTrackOn }}
-          thumbColor={theme === 'dark' ? colors.switchThumb : '#f4f4f5'}
-        />
-      </View>
-      <Text style={styles.helperText}>
-        Activa el modo oscuro para reducir el brillo y descansar la vista.
-      </Text>
-    </View>
-  );
-};
-
-export default SettingsScreen;
+  export default SettingsScreen;

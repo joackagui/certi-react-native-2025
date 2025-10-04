@@ -17,3 +17,7 @@ Botón “⭐ Favorito” (estado en memoria).
 - lugaresStore: lugares[], toggleFavorito(id) (en memoria), filtros.  
 ### Estilos:
 - Tokens (colores, spacing, fuente), tema light/dark.
+
+### app similares
+- [Turismo La Paz](https://pin.it/51oytU7eo)
+- [La Paz Travel Guide](https://dribbble.com/shots/25128281-Travel-Planner?utm_source=Clipboard_Shot&utm_campaign=Lora_web&utm_content=Travel+Planner&utm_medium=Social_Share&utm_source=Pinterest_Shot&utm_campaign=Lora_web&utm_content=Travel+Planner&utm_medium=Social_Share)

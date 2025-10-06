@@ -10,3 +10,5 @@ Stack en Mercado: MercadoList → ItemDetail.
 store ui
 store market 
 store user 
+
+![alt text](image.png)

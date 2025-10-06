@@ -4,6 +4,7 @@
 /build
 
 /public/ai-images/*.png
+storage/
 
 # Logs
 logs

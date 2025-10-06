@@ -8,6 +8,7 @@ import {
   Modality,
 } from '@google/genai';
 import { v4 as uuidV4 } from 'uuid';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 
 import { geminiUploadFiles } from '../helpers/gemini-upload-file';
 import { ImageGenerationDto } from '../dtos/image-generation.dto';
@@ -20,9 +21,28 @@ const AI_IMAGES_PATH = path.join(
   'public/ai-images',
 );
 
+const logger = new Logger('ImageGenerationUseCase');
+
+const ensureAiImagesDirectory = () => {
+  try {
+    if (!fs.existsSync(AI_IMAGES_PATH)) {
+      fs.mkdirSync(AI_IMAGES_PATH, { recursive: true });
+    }
+  } catch (error) {
+    logger.error(
+      'No se pudo crear el directorio para las imágenes generadas',
+      error instanceof Error ? error.stack : String(error),
+    );
+    throw new InternalServerErrorException('No se pudo preparar el almacenamiento de imágenes');
+  }
+};
+
+ensureAiImagesDirectory();
+
 interface Options {
   model?: string;
   systemInstruction?: string;
+  baseUrl?: string;
 }
 
 export interface ImageGenerationResponse {
@@ -46,7 +66,7 @@ export const imageGenerationUseCase = async (
     contents.push(createPartFromUri(file.uri ?? '', file.mimeType ?? ''));
   });
 
-  const { model = 'gemini-2.0-flash-exp-image-generation' } = options ?? {};
+  const { model = 'gemini-2.0-flash-exp-image-generation', baseUrl } = options ?? {};
 
   const response = await ai.models.generateContent({
     model: model,
@@ -74,8 +94,22 @@ export const imageGenerationUseCase = async (
     const buffer = Buffer.from(imageData, 'base64');
     const imagePath = path.join(AI_IMAGES_PATH, `${imageId}.png`);
 
-    fs.writeFileSync(imagePath, buffer);
-    imageUrl = `${process.env.API_URL}/ai-images/${imageId}.png`;
+    try {
+      fs.writeFileSync(imagePath, buffer);
+    } catch (error) {
+      logger.error(
+        'No se pudo guardar la imagen generada',
+        error instanceof Error ? error.stack : String(error),
+      );
+      throw new InternalServerErrorException('No se pudo guardar la imagen generada');
+    }
+
+    const apiUrl = baseUrl ?? process.env.API_URL;
+    if (!apiUrl) {
+      logger.warn('API_URL no está configurado; no se puede generar la URL pública de la imagen');
+    } else {
+      imageUrl = `${apiUrl}/ai-images/${imageId}.png`;
+    }
   }
 
   return {

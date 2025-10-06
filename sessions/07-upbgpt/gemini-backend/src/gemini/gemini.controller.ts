@@ -1,8 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpException,
   HttpStatus,
+  InternalServerErrorException,
+  Logger,
   Param,
   Post,
   Res,
@@ -23,6 +27,8 @@ import { TriviaQuestionDto } from './dtos/trivia-question.dto';
 
 @Controller('gemini')
 export class GeminiController {
+  private readonly logger = new Logger(GeminiController.name);
+
   constructor(private readonly geminiService: GeminiService) {}
 
   async outputStreamResponse(
@@ -34,19 +40,28 @@ export class GeminiController {
     res.status(HttpStatus.OK);
 
     let resultText = '';
-    for await (const chunk of stream) {
-      const piece = chunk.text;
-      resultText += piece;
-      res.write(piece);
-    }
+    try {
+      for await (const chunk of stream) {
+        const piece = chunk.text;
+        resultText += piece;
+        res.write(piece);
+      }
 
-    res.end();
-    return resultText;
+      res.end();
+      return resultText;
+    } catch (error) {
+      this.handleStreamError(res, error, 'No se pudo completar la respuesta en streaming');
+      return resultText;
+    }
   }
 
   @Post('basic-prompt')
-  basicPrompt(@Body() basicPromptDto: BasicPromptDto) {
-    return this.geminiService.basicPrompt(basicPromptDto);
+  async basicPrompt(@Body() basicPromptDto: BasicPromptDto) {
+    try {
+      return await this.geminiService.basicPrompt(basicPromptDto);
+    } catch (error) {
+      this.handleError(error, 'No se pudo completar el prompt básico');
+    }
   }
 
   @Post('basic-prompt-stream')
@@ -58,8 +73,12 @@ export class GeminiController {
   ) {
     basicPromptDto.files = files;
 
-    const stream = await this.geminiService.basicPromptStream(basicPromptDto);
-    void this.outputStreamResponse(res, stream);
+    try {
+      const stream = await this.geminiService.basicPromptStream(basicPromptDto);
+      await this.outputStreamResponse(res, stream);
+    } catch (error) {
+      this.handleStreamError(res, error, 'No se pudo generar la respuesta en streaming');
+    }
   }
 
   @Post('chat-stream')
@@ -71,28 +90,47 @@ export class GeminiController {
   ) {
     chatPromptDto.files = files;
 
-    const stream = await this.geminiService.chatStream(chatPromptDto);
-    const data = await this.outputStreamResponse(res, stream);
+    try {
+      const stream = await this.geminiService.chatStream(chatPromptDto);
+      const data = await this.outputStreamResponse(res, stream);
 
-    const geminiMessage = {
-      role: 'model',
-      parts: [{ text: data }],
-    };
-    const userMessage = {
-      role: 'user',
-      parts: [{ text: chatPromptDto.prompt }],
-    };
+      const geminiMessage = {
+        role: 'model',
+        parts: [{ text: data }],
+      };
+      const userMessage = {
+        role: 'user',
+        parts: [{ text: chatPromptDto.prompt }],
+      };
 
-    this.geminiService.saveMessage(chatPromptDto.chatId, userMessage);
-    this.geminiService.saveMessage(chatPromptDto.chatId, geminiMessage);
+      await this.geminiService.saveMessage(chatPromptDto.chatId, userMessage);
+      await this.geminiService.saveMessage(chatPromptDto.chatId, geminiMessage);
+    } catch (error) {
+      this.handleStreamError(res, error, 'No se pudo completar el chat en streaming');
+    }
   }
 
   @Get('chat-history/:chatId')
-  getChatHistory(@Param('chatId') chatId: string) {
-    return this.geminiService.getChatHistory(chatId).map((message) => ({
+  async getChatHistory(@Param('chatId') chatId: string) {
+    const history = await this.geminiService.getChatHistory(chatId);
+
+    return history.map((message) => ({
       role: message.role,
       parts: message.parts?.map((part) => part.text).join(''),
     }));
+  }
+
+  @Delete('chat-history/:chatId')
+  async clearChatHistory(@Param('chatId') chatId: string) {
+    try {
+      await this.geminiService.clearChatHistory(chatId);
+      return {
+        chatId,
+        cleared: true,
+      };
+    } catch (error) {
+      this.handleError(error, 'No se pudo limpiar el historial del chat');
+    }
   }
 
   @Post('image-generation')
@@ -103,22 +141,62 @@ export class GeminiController {
   ) {
     imageGenerationDto.files = files;
 
-    const { imageUrl, text } =
-      await this.geminiService.imageGeneration(imageGenerationDto);
+    try {
+      const { imageUrl, text } = await this.geminiService.imageGeneration(
+        imageGenerationDto,
+      );
 
-    return {
-      imageUrl,
-      text,
-    };
+      return {
+        imageUrl,
+        text,
+      };
+    } catch (error) {
+      this.handleError(error, 'No se pudo generar la imagen');
+    }
   }
 
   @Post('pokemon-helper')
-  getPokemonHelp(@Body() pokemonHelperDto: PokemonHelperDto) {
-    return this.geminiService.getPokemonHelp(pokemonHelperDto);
+  async getPokemonHelp(@Body() pokemonHelperDto: PokemonHelperDto) {
+    try {
+      return await this.geminiService.getPokemonHelp(pokemonHelperDto);
+    } catch (error) {
+      this.handleError(error, 'No se pudo obtener la ayuda de Pokémon');
+    }
   }
 
   @Get('trivia/question/:topic')
-  getTriviaQuestion(@Param() triviaQuestionDto: TriviaQuestionDto) {
-    return this.geminiService.getTriviaQuestion(triviaQuestionDto);
+  async getTriviaQuestion(@Param() triviaQuestionDto: TriviaQuestionDto) {
+    try {
+      return await this.geminiService.getTriviaQuestion(triviaQuestionDto);
+    } catch (error) {
+      this.handleError(error, 'No se pudo obtener la pregunta de trivia');
+    }
+  }
+
+  private handleError(error: unknown, message: string): never {
+    this.logger.error(message, error instanceof Error ? error.stack : String(error));
+
+    if (error instanceof HttpException) {
+      throw error;
+    }
+
+    throw new InternalServerErrorException(message);
+  }
+
+  private handleStreamError(res: Response, error: unknown, message: string) {
+    this.logger.error(message, error instanceof Error ? error.stack : String(error));
+
+    if (res.writableEnded) {
+      return;
+    }
+
+    if (!res.headersSent) {
+      const status = error instanceof HttpException ? error.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+      res.status(status).json({ message, error: error instanceof Error ? error.message : String(error) });
+      return;
+    }
+
+    res.write('\n[Error] ' + message);
+    res.end();
   }
 }

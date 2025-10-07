@@ -7,11 +7,15 @@ import {
   View,
   StyleSheet,
   Keyboard,
+  TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
-
+import * as ImagePicker from 'expo-image-picker';
 import { useChatStore, ChatMessage } from '../../src/store/chatStore';
+import { getGeminiMessage } from '../../src/services/ai';
+import Markdown from 'react-native-markdown-display';
 // import { mockAIReply } from '../../src/services/ai';
 
 type DecoratedMessage = ChatMessage & {
@@ -83,7 +87,11 @@ function Bubble({ item }: { item: DecoratedMessage }) {
             </Text>
           )}
 
-          <Text style={[styles.bubbleText, isUser && styles.userText]}>{item.content}</Text>
+          <Text style={[styles.bubbleText, isUser && styles.userText]}>
+            <Markdown>
+              {item.content}
+            </Markdown>
+          </Text>
 
           <View
             style={[
@@ -170,8 +178,8 @@ export default function ChatScreen() {
     const placeholder = pushMessage({ role: 'assistant', content: 'Escribiendo…' });
 
     try {
-      const replyText = 'Esta es una respuesta simulada del asistente.';
-      // const replyText = await mockAIReply([...sorted, userMsg]);
+      // const replyText = 'Esta es una respuesta simulada del asistente.';
+      const replyText = await getGeminiMessage(userMsg.content);
       replaceMessage(placeholder.id, { content: replyText });
     } catch (e: any) {
       replaceMessage(placeholder.id, { content: 'Ocurrió un error obteniendo la respuesta.' });
@@ -191,6 +199,16 @@ export default function ChatScreen() {
       <Bubble item={item} />
     </View>
   );
+
+  const pickImage = async () => {
+    console.log('Pick image');
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Se requieren permisos para acceder a las fotos.');
+      return;
+    }
+    const result = 
+  }
 
   return (
     <KeyboardAvoidingView
@@ -236,9 +254,23 @@ export default function ChatScreen() {
               size="large"
               textStyle={styles.inputText}
               style={styles.input}
+              accessoryLeft = {(iconProps) => (
+                <TouchableOpacity onPress={pickImage}>
+                  <Icon {...iconProps} name="camera-outline" />
+                </TouchableOpacity>
+              )}
+              accessoryRight={(iconProps) => (
+                <TouchableOpacity onPress={send} disabled={!text.trim() || isThinking}>
+                  {isThinking ? (
+                    <Spinner {...iconProps} size="tiny" />
+                  ) : (
+                    <Icon {...iconProps} name="paper-plane" />
+                  )}
+                </TouchableOpacity>
+              )}
             />
           </View>
-          <Button
+          {/* <Button
             onPress={send}
             disabled={!text.trim() || isThinking}
             appearance="filled"
@@ -246,7 +278,7 @@ export default function ChatScreen() {
             style={styles.sendButton}
           >
             {isThinking ? <Spinner size="tiny" /> : 'Enviar'}
-          </Button>
+          </Button> */}
         </Layout>
       </Layout>
     </KeyboardAvoidingView>

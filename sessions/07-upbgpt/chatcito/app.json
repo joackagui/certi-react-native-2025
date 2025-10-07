@@ -28,7 +28,11 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      // "expo-image-picker",
+      // {
+      //   "photosPermission": "Compartir imágenes con Chatcito"
+      // }
     ]
   }
 }

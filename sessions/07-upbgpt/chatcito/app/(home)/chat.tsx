@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   Alert,
   ScrollView,
-  Image
+  Image,
+  Modal
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -80,7 +81,7 @@ function Bubble({ item }: { item: DecoratedMessage }) {
             !item.showMeta && (isUser ? styles.userBubbleStacked : styles.assistantBubbleStacked),
           ]}
         >
-          { !isUser && (
+          {!isUser && (
             <Text
               category="c2"
               style={[styles.bubbleLabel, isUser ? styles.userLabel : styles.assistantLabel]}
@@ -127,6 +128,7 @@ export default function ChatScreen() {
   const openPreview = (index: number) => {
     setPreviewIndex(index);
     setPreviewVisible(true);
+    console.log('openPreview');
   }
 
   const closePreview = () => {
@@ -238,7 +240,7 @@ export default function ChatScreen() {
       allowsMultipleSelection: true
     });
 
-    if(!result.canceled) {
+    if (!result.canceled) {
       const uris = result.assets.map(asset => asset.uri);
       console.log('Selected images:', uris);
       setPhotos(prev => [...prev, ...uris]);
@@ -274,10 +276,16 @@ export default function ChatScreen() {
                   photos.map((uri, ind) => {
                     return (
                       <View key={`${uri}-${ind}`} style={styles.imageContent}>
-                        <TouchableOpacity 
+                        <TouchableOpacity
                           onPress={() => openPreview(ind)}
                           activeOpacity={0.8}>
-                            <Image source={{uri}} style={styles.thumb} />
+                          <Image source={{ uri }} style={styles.thumb} />
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => removePhoto(ind)}
+                          activeOpacity={0.8}>
+                          <Icon name='close-outline'
+                            fill="black" style={styles.removePhoto} />
                         </TouchableOpacity>
                       </View>
                     )
@@ -287,6 +295,23 @@ export default function ChatScreen() {
             </Layout>
           )
         }
+        <Modal
+          visible={previewVisible}
+          transparent
+          animationType='fade'
+          onRequestClose={closePreview}
+        >
+          {previewIndex !== null && (
+            <View style={styles.modalImage}>
+              <Image
+                source={{ uri: photos[previewIndex] }}
+                style={styles.previewImage}
+              />
+            </View>
+          )
+
+          }
+        </Modal>
         <Layout
           style={[
             styles.composer,
@@ -309,7 +334,7 @@ export default function ChatScreen() {
               size="large"
               textStyle={styles.inputText}
               style={styles.input}
-              accessoryLeft = {(iconProps) => (
+              accessoryLeft={(iconProps) => (
                 <TouchableOpacity onPress={pickImage}>
                   <Icon {...iconProps} name="camera-outline" />
                 </TouchableOpacity>
@@ -332,15 +357,37 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
+  modalImage: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 30
+  },
+  previewImage:{
+    width: '100%',
+    height: '40%',
+    borderRadius: 10
+  },
   previewBar: {
     borderTopWidth: StyleSheet.hairlineWidth,
     borderColor: '#edf1f7',
     backgroundColor: '#edf1f7',
     paddingHorizontal: 10,
     paddingTop: 5,
-    paddingBottom: 3 
+    paddingBottom: 3
   },
-  imageContent:{
+  removePhoto: {
+    position: 'absolute',
+    backgroundColor: '#edf1f7',
+    top: -60,
+    right: -6,
+    width: 20,
+    color: 'black',
+    height: 20,
+    borderRadius: 15
+  },
+  imageContent: {
     width: 50,
     height: 50,
     borderRadius: 10,

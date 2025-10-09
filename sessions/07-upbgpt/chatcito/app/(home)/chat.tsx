@@ -9,6 +9,8 @@ import {
   Keyboard,
   TouchableOpacity,
   Alert,
+  ScrollView,
+  Image
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -118,6 +120,29 @@ export default function ChatScreen() {
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+
+  const openPreview = (index: number) => {
+    setPreviewIndex(index);
+    setPreviewVisible(true);
+  }
+
+  const closePreview = () => {
+    setPreviewVisible(false);
+    setPreviewIndex(null);
+  }
+
+  const removePhoto = (currentIndex: number) => {
+    setPhotos(prev => prev.filter((_photo, index) => index !== currentIndex));
+  };
+
+  const clearPhotos = () => {
+    setPhotos([]);
+    setPreviewVisible(false);
+    setPreviewIndex(null);
+  };
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -207,8 +232,18 @@ export default function ChatScreen() {
       Alert.alert('Se requieren permisos para acceder a las fotos.');
       return;
     }
-    const result = 
-  }
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+      allowsMultipleSelection: true
+    });
+
+    if(!result.canceled) {
+      const uris = result.assets.map(asset => asset.uri);
+      console.log('Selected images:', uris);
+      setPhotos(prev => [...prev, ...uris]);
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -231,7 +266,27 @@ export default function ChatScreen() {
           onLayout={scrollToEnd}
           style={styles.list}
         />
-
+        {
+          photos.length > 0 && (
+            <Layout level="1" style={styles.previewBar}>
+              <ScrollView horizontal>
+                {
+                  photos.map((uri, ind) => {
+                    return (
+                      <View key={`${uri}-${ind}`} style={styles.imageContent}>
+                        <TouchableOpacity 
+                          onPress={() => openPreview(ind)}
+                          activeOpacity={0.8}>
+                            <Image source={{uri}} style={styles.thumb} />
+                        </TouchableOpacity>
+                      </View>
+                    )
+                  })
+                }
+              </ScrollView>
+            </Layout>
+          )
+        }
         <Layout
           style={[
             styles.composer,
@@ -270,15 +325,6 @@ export default function ChatScreen() {
               )}
             />
           </View>
-          {/* <Button
-            onPress={send}
-            disabled={!text.trim() || isThinking}
-            appearance="filled"
-            size="large"
-            style={styles.sendButton}
-          >
-            {isThinking ? <Spinner size="tiny" /> : 'Enviar'}
-          </Button> */}
         </Layout>
       </Layout>
     </KeyboardAvoidingView>
@@ -286,6 +332,26 @@ export default function ChatScreen() {
 }
 
 const styles = StyleSheet.create({
+  previewBar: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderColor: '#edf1f7',
+    backgroundColor: '#edf1f7',
+    paddingHorizontal: 10,
+    paddingTop: 5,
+    paddingBottom: 3 
+  },
+  imageContent:{
+    width: 50,
+    height: 50,
+    borderRadius: 10,
+    position: 'relative',
+    marginLeft: 15,
+    marginVertical: 10
+  },
+  thumb: {
+    width: '100%',
+    height: '100%'
+  },
   screen: {
     flex: 1,
     backgroundColor: '#edf1f7',

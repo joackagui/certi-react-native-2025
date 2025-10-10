@@ -111,7 +111,7 @@ export default function ChatScreen() {
     try {
       // const replyText = 'Esta es una respuesta simulada del asistente.';
       const replyText = await postImageGeneration(userMsg.content);
-      replaceMessage(placeholder.id, { content: replyText.text });
+      replaceMessage(placeholder.id, { content: replyText.text, photos: [replyText.imageUrl] });
     } catch (e: any) {
       console.log(e)
       replaceMessage(placeholder.id, { content: 'Ocurrió un error obteniendo la respuesta.' });

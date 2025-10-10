@@ -170,7 +170,7 @@ export const postImageGeneration = async (
   const text = typeof result.text === 'string' ? result.text : '';
   const raw =
     typeof response.data === 'string' ? response.data : JSON.stringify(response.data ?? {});
-
+  console.log('Image generation result:', { imageUrl, text, raw });
   return {
     imageUrl,
     text,

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Layout, Icon, Text } from '@ui-kitten/components';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Image} from 'react-native';
 import Markdown from 'react-native-markdown-display';
 
 import { DecoratedMessage } from '../hooks/useDecoratedMessages';
@@ -11,7 +11,7 @@ type MessageBubbleProps = {
 
 export const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isUser = message.role === 'user';
-
+  console.log('Rendering message:', message);
   return (
     <View
       style={[
@@ -76,7 +76,17 @@ export const MessageBubble = ({ message }: MessageBubbleProps) => {
           >
             {message.content}
           </Markdown>
-
+          {
+            message.photos && message.photos.map((uri, idx) => (
+              <View key={`${uri}-${idx}`} style={{ marginTop: 8 }}>
+                <Image
+                  source={{ uri }}
+                  style={{ width: 200, height: 200, borderRadius: 8 }}
+                  resizeMode="cover"
+                />
+              </View>
+            ))
+          }
           <View
             style={[
               styles.timeRow,

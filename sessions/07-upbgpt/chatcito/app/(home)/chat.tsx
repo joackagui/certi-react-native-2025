@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
 import * as ImagePicker from 'expo-image-picker';
 import { useChatStore } from '../../src/store/chatStore';
-import { getGeminiMessage } from '../../src/services/ai';
+import { postImageGeneration } from '../../src/services/ai';
 import { useDecoratedMessages, DecoratedMessage } from '../../src/features/chat/hooks/useDecoratedMessages';
 import { MessageList } from '../../src/features/chat/components/MessageList';
 import { MediaPreviewBar } from '../../src/features/chat/components/MediaPreviewBar';
@@ -102,7 +102,7 @@ export default function ChatScreen() {
     const content = text.trim();
     if (!content || isThinking) return;
     setText('');
-    const userMsg = pushMessage({ role: 'user', content });
+    const userMsg = pushMessage({ role: 'user', content, photos });
     scrollToEnd();
 
     setThinking(true);
@@ -110,8 +110,8 @@ export default function ChatScreen() {
 
     try {
       // const replyText = 'Esta es una respuesta simulada del asistente.';
-      const replyText = await getGeminiMessage(userMsg.content);
-      replaceMessage(placeholder.id, { content: replyText });
+      const replyText = await postImageGeneration(userMsg.content);
+      replaceMessage(placeholder.id, { content: replyText.text });
     } catch (e: any) {
       console.log(e)
       replaceMessage(placeholder.id, { content: 'Ocurrió un error obteniendo la respuesta.' });

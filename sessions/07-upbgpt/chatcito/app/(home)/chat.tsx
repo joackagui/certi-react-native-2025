@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Layout } from '@ui-kitten/components';
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Layout } from "@ui-kitten/components";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -7,22 +7,35 @@ import {
   StyleSheet,
   Keyboard,
   Alert,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useHeaderHeight } from '@react-navigation/elements';
-import * as ImagePicker from 'expo-image-picker';
-import { useChatStore } from '../../src/store/chatStore';
-import { postImageGeneration } from '../../src/services/ai';
-import { useDecoratedMessages, DecoratedMessage } from '../../src/features/chat/hooks/useDecoratedMessages';
-import { MessageList } from '../../src/features/chat/components/MessageList';
-import { MediaPreviewBar } from '../../src/features/chat/components/MediaPreviewBar';
-import { ImagePreviewModal } from '../../src/features/chat/components/ImagePreviewModal';
-import { ChatComposer } from '../../src/features/chat/components/ChatComposer';
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useHeaderHeight } from "@react-navigation/elements";
+import * as ImagePicker from "expo-image-picker";
+import { useChatStore } from "../../src/store/chatStore";
+import { postImageGeneration } from "../../src/services/ai";
+import {
+  useDecoratedMessages,
+  DecoratedMessage,
+} from "../../src/features/chat/hooks/useDecoratedMessages";
+import { MessageList } from "../../src/features/chat/components/MessageList";
+import { MediaPreviewBar } from "../../src/features/chat/components/MediaPreviewBar";
+import { ImagePreviewModal } from "../../src/features/chat/components/ImagePreviewModal";
+import { ChatComposer } from "../../src/features/chat/components/ChatComposer";
 
 export default function ChatScreen() {
-  const { messages, pushMessage, isThinking, setThinking, replaceMessage } = useChatStore();
-  const [text, setText] = useState('');
-  const listRef = useRef<FlatList<DecoratedMessage>>(null);
+  const {
+    getCurrentChat,
+    pushMessage,
+    isThinking,
+    setThinking,
+    replaceMessage,
+  } = useChatStore();
+
+  const currentChat = getCurrentChat();
+  const messages = currentChat?.messages || [];
+
+  const [text, setText] = useState("");
+  const listRef = useRef<FlatList<DecoratedMessage>>(null!);
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -86,11 +99,17 @@ export default function ChatScreen() {
   }, []);
 
   useEffect(() => {
-    const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showEvent =
+      Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent =
+      Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
 
-    const showSub = Keyboard.addListener(showEvent, () => setKeyboardVisible(true));
-    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardVisible(false));
+    const showSub = Keyboard.addListener(showEvent, () =>
+      setKeyboardVisible(true)
+    );
+    const hideSub = Keyboard.addListener(hideEvent, () =>
+      setKeyboardVisible(false)
+    );
 
     return () => {
       showSub.remove();
@@ -101,20 +120,30 @@ export default function ChatScreen() {
   const send = useCallback(async () => {
     const content = text.trim();
     if (!content || isThinking) return;
-    setText('');
-    const userMsg = pushMessage({ role: 'user', content, photos });
+    setText("");
+    const userMsg = pushMessage({ role: "user", content, photos: photos });
     scrollToEnd();
 
     setThinking(true);
-    const placeholder = pushMessage({ role: 'assistant', content: 'Escribiendo…' });
+
+    const placeholder = pushMessage({
+      role: "assistant",
+      content: "Escribiendo…",
+      photos: [],
+    });
 
     try {
       // const replyText = 'Esta es una respuesta simulada del asistente.';
       const replyText = await postImageGeneration(userMsg.content);
-      replaceMessage(placeholder.id, { content: replyText.text });
+      replaceMessage(placeholder.id, {
+        content: replyText.text,
+        photos: replyText.imageUrl ? [replyText.imageUrl] : [],
+      });
     } catch (e: any) {
-      console.log(e)
-      replaceMessage(placeholder.id, { content: 'Ocurrió un error obteniendo la respuesta.' });
+      console.log(e);
+      replaceMessage(placeholder.id, {
+        content: "Ocurrió un error obteniendo la respuesta.",
+      });
     } finally {
       setThinking(false);
       setTimeout(scrollToEnd, 100);
@@ -123,19 +152,19 @@ export default function ChatScreen() {
 
   const pickImage = useCallback(async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Se requieren permisos para acceder a las fotos.');
+    if (status !== "granted") {
+      Alert.alert("Se requieren permisos para acceder a las fotos.");
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.7,
-      allowsMultipleSelection: true
+      allowsMultipleSelection: true,
     });
 
     if (!result.canceled) {
-      const uris = result.assets.map(asset => asset.uri);
-      setPhotos(prev => [...prev, ...uris]);
+      const uris = result.assets.map((asset) => asset.uri);
+      setPhotos((prev) => [...prev, ...uris]);
     }
   }, []);
 
@@ -147,8 +176,11 @@ export default function ChatScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.screen}
-      behavior={Platform.select({ ios: 'padding', android: undefined })}
-      keyboardVerticalOffset={Platform.select({ ios: headerHeight, android: 0 })}
+      behavior={Platform.select({ ios: "padding", android: undefined })}
+      keyboardVerticalOffset={Platform.select({
+        ios: headerHeight,
+        android: 0,
+      })}
     >
       <Layout style={styles.container} level="2">
         <MessageList
@@ -187,7 +219,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#edf1f7',
+    backgroundColor: "#edf1f7",
   },
   container: {
     flex: 1,

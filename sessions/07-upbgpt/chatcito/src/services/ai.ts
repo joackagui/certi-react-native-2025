@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://articulately-jaspered-karsyn.ngrok-free.dev/api';
 
 const IMAGE_MIME_MAP: Record<string, string> = {
   jpg: 'image/jpeg',

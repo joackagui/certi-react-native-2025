@@ -7,27 +7,15 @@ import { Ionicons } from '@expo/vector-icons';
 import { Search } from '../../src/components/Search';
 import { SearchBar } from '../../src/components/SearchBar';
 import { useLocation } from '../../src/hooks/useLocation';
+import { useMapCamera } from '../../src/hooks/useMapCamera';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
   const { location, setLocation, loading } = useLocation();
-  
+  const { centerOn } = useMapCamera(mapRef);
+
   const [jumping, setJumping] = useState(false);
   const [searchText, setSearchText] = useState('');  
-
-  const centerOn = useCallback((lat: number, lng: number, animate = true) => {
-    const region = {
-      latitude: lat,
-      longitude: lng,
-      latitudeDelta: 0.01,
-      longitudeDelta: 0.01
-    };
-    if (animate) {
-      mapRef.current?.animateToRegion(region, 600);
-    } else {
-      mapRef.current?.animateToRegion(region);
-    }
-  }, []);
 
   const goToMyLocation = useCallback(async () => {
     try {

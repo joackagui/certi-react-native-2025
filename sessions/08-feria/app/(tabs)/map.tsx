@@ -6,30 +6,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Search } from '../../src/components/Search';
 import { SearchBar } from '../../src/components/SearchBar';
+import { useLocation } from '../../src/hooks/useLocation';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { location, setLocation, loading } = useLocation();
+  
   const [jumping, setJumping] = useState(false);
-  const [searchText, setSearchText] = useState('');
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permiso requerido', 'Activa el permiso de ubicación para centrar el mapa en tu posición.');
-        setLoading(false);
-        return;
-      }
-
-      const current = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-      setLocation(current);
-      setLoading(false);
-
-      centerOn(current.coords.latitude, current.coords.longitude, false);
-    })();
-  }, []);
+  const [searchText, setSearchText] = useState('');  
 
   const centerOn = useCallback((lat: number, lng: number, animate = true) => {
     const region = {
@@ -58,7 +42,7 @@ export default function MapScreen() {
         }
       }
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
-      setLocation(pos);
+      setLocation(pos.coords);
       centerOn(pos.coords.latitude, pos.coords.longitude, true);
     } catch (e) {
       Alert.alert('Error', 'No se pudo obtener tu ubicación.');
@@ -81,8 +65,8 @@ export default function MapScreen() {
           {location && (
             <Marker
               coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude,
+                latitude: location.latitude,
+                longitude: location.longitude,
               }}
               title="Estás aquí"
             />

@@ -16,3 +16,5 @@ export type Vendor = {
     category: Category;
     schedule: Schedule;
 }
+
+export type LocationCoord = { latitude: number; longitude: number; };

@@ -1,8 +1,26 @@
 export const CATEGORIES = [
-    "Ropa" 
-    , "Autos"
-    , "Juguetes"
-    , "Animales" 
-    , "Celulares" 
-    , "Muebles"
+    {
+        name: "Ropa",
+        active: false
+    },
+    {
+        name: "Autos",
+        active: false
+    },
+    {
+        name: "Juguetes",
+        active: false
+    },
+    {
+        name: "Animales",
+        active: false
+    },
+    {
+        name: "Celulares",
+        active: false
+    },
+    {
+        name: "Muebles",
+        active: false
+    }
 ]

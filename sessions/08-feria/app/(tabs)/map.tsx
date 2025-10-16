@@ -9,6 +9,7 @@ import { SearchBar } from '../../src/components/SearchBar';
 import { useLocation } from '../../src/hooks/useLocation';
 import { useMapCamera } from '../../src/hooks/useMapCamera';
 import { GoToLocationFab } from '../../src/components/goToLocationFab';
+import { Filters } from '../../src/components/Filters';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
@@ -64,6 +65,7 @@ export default function MapScreen() {
         <Search>
           <Text>Feria 16 de Julio</Text>
           <SearchBar value={searchText} onChange={setSearchText} />
+          <Filters/>
         </Search>
         <GoToLocationFab goToMyLocation={goToMyLocation} jumping={jumping} />
       </View>

@@ -1,5 +1,7 @@
-import { Text, View, StyleSheet, Pressable } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { CATEGORIES } from '../data/categories';
+import React from 'react';
+import { Filter } from './Filter';
 export const Filters = () => {
 
     const selectCategory = (category: string) => {
@@ -11,11 +13,11 @@ export const Filters = () => {
                 CATEGORIES.length > 0 && CATEGORIES.map(
                     (category, index) => {
                         return (
-                            <Pressable key={`${category}-${index}`} 
-                                style={styles.chip}
-                                onPress={() => { selectCategory(category) }}>
-                                <Text style={styles.text}>{category}</Text>
-                            </Pressable>
+                            <Filter
+                                cat={category}
+                                index={index}
+                                selectCategory={selectCategory}
+                            />
                         )
 
                     }
@@ -31,17 +33,5 @@ const styles = StyleSheet.create({
         marginLeft: 5,
         flexDirection: 'row',
         flexWrap: 'wrap'
-    },
-    text: {
-        marginHorizontal: 5,
-        marginVertical: 5,
-        color: 'white'
-    },
-    chip: {
-        backgroundColor: '#0019b0',
-        borderRadius: 50,
-        marginVertical: 3,
-        marginHorizontal: 3,
-        paddingHorizontal: 2
     }
 })

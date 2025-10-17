@@ -1,11 +1,18 @@
 import { View, StyleSheet } from 'react-native';
 import { CATEGORIES } from '../data/categories';
-import React,  { useState }  from 'react';
+import React, { useState } from 'react';
 import { Filter } from './Filter';
 export const Filters = () => {
-    const [categories, setCategory] = useState(CATEGORIES);
-    const selectCategory = (category: { name: string, active: boolean}) => {
-        console.log('hiciste tap en ', category);
+    const [categories, setCategories] = useState(CATEGORIES);
+
+    const selectCategory = (currentCategory: { name: string, active: boolean }) => {
+        setCategories(categories.map((category) => {
+            return (currentCategory.name === category.name) ?
+                { name: category.name, active: !category.active } 
+                : category;
+
+        }))
+
     }
     return (
         <View style={styles.container}>

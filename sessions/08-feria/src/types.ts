@@ -2,7 +2,9 @@ export type Category =
     "Ropa" 
     | "Autos"
     | "Juguetes"
-    | "Animales" | "Celulares" | "Muebles";
+    | "Animales" 
+    | "Celulares" 
+    | "Muebles";
 
 export type Schedule = {
     openTime: string;

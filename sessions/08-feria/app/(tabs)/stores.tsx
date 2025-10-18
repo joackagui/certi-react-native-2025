@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { Vendors } from '../../src/components/Vendors';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const StoreScreen = () => {
     return (
-        <View>
-            <Text>
-                HOla desde Store
-            </Text>
-        </View>
+        <SafeAreaView>
+            <Vendors />
+        </SafeAreaView>
     );
 }
 export default StoreScreen;

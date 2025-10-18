@@ -16,3 +16,11 @@ Design tokens (espaciados, tipografías, colores).
 Tema light/dark (al menos colores de fondo/textos).
 
 Búsqueda básica (por titulo o lugar) y filtro por categoria (en memoria).
+
+
+## Objetivo del 2do Parcial
+### Autenticación (Firebase Auth)
+- Registro e inicio de sesión con email + password.
+- Login con Google
+- Flujo de sesión completo: splash/loading → (si token válido) Home, si no → Auth screens.
+- Recuperar contraseña por email

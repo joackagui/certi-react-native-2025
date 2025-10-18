@@ -12,3 +12,10 @@ store market
 store user 
 
 ![alt text](image.png)
+
+## Objetivo del 2do Parcial
+### Autenticación (Firebase Auth)
+- Registro e inicio de sesión con email + password.
+- Login con Google
+- Flujo de sesión completo: splash/loading → (si token válido) Home, si no → Auth screens.
+- Recuperar contraseña por email

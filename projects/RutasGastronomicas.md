@@ -35,3 +35,10 @@ Pantallas: Home, PlatosList, PlatoDetail, Favoritos (placeholder), Perfil (place
 Mock data local (/src/data/platos.json).
 
 README con setup y mapa de rutas.
+
+## Objetivo del 2do Parcial
+### Autenticación (Firebase Auth)
+- Registro e inicio de sesión con email + password.
+- Login con Google
+- Flujo de sesión completo: splash/loading → (si token válido) Home, si no → Auth screens.
+- Recuperar contraseña por email

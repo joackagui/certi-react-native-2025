@@ -43,3 +43,23 @@ Tokens (colores/espaciado/tipografía), tema light/dark funcional.
 - users/{uid}/intereses/{eventoId}: marca “Me interesa” (persistente).
 - (Opcional) clubs y servicios (estático editable por admin).
 - Covers en Firebase Storage (events/yyyy/mm/… y announcements/yyyy/mm/…).
+### Home “dinámico”
+
+-    Tarjetas: Próximos eventos (por campus del usuario), Últimos anuncios, Hoy en tu horario.
+-   Botones rápidos: “Ver todos”, “Mi campus”, “Mi horario”.
+
+### Eventos
+
+-   FlatList con filtros server + cliente:
+
+-   Campus (obligatorio), categoría (charlas, deportes, cultural, académico…), intervalo de fechas (hoy/semana/mes).
+
+-   Detalle: cover, descripción, fecha/hora, campus, lugar (link a Maps), Me interesa (persistente), RSVP opcional (going|maybe|no).
+
+-   Recordatorio: notificación local 1h antes si “Me interesa”
+
+### Anuncios
+
+- FlatList con búsqueda por texto (server titleLower prefijo + cliente).
+- Soporte de programación: mostrar si publishAt <= now y status="approved".
+- Detalle: cover opcional, contenido extendido, tags/campus.

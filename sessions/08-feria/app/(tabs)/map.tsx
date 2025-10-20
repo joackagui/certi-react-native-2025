@@ -10,6 +10,7 @@ import { useLocation } from '../../src/hooks/useLocation';
 import { useMapCamera } from '../../src/hooks/useMapCamera';
 import { GoToLocationFab } from '../../src/components/goToLocationFab';
 import { Filters } from '../../src/components/Filters';
+import { VENDORS } from '../../src/data/vendors';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
@@ -61,6 +62,17 @@ export default function MapScreen() {
               title="Estás aquí"
             />
           )}
+          {VENDORS.map((vendor) => {
+            return (
+              <Marker
+                coordinate={{
+                  latitude: vendor.lat,
+                  longitude: vendor.log,
+                }}
+                title={vendor.name}
+              />
+            );
+          })}
         </MapView>
         <Search>
           <Text>Feria 16 de Julio</Text>

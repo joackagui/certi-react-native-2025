@@ -1,26 +1,44 @@
-import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, View, Platform, Alert, Text } from 'react-native';
-import MapView, { Marker, Region } from 'react-native-maps';
-import * as Location from 'expo-location';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react";
+import {
+  StyleSheet,
+  ActivityIndicator,
+  View,
+  Platform,
+  Alert,
+  Text,
+} from "react-native";
+import MapView, { Marker, Region } from "react-native-maps";
+import * as Location from "expo-location";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Search } from '../../src/components/Search';
-import { SearchBar } from '../../src/components/SearchBar';
-import { useLocation } from '../../src/hooks/useLocation';
-import { useMapCamera } from '../../src/hooks/useMapCamera';
-import { GoToLocationFab } from '../../src/components/goToLocationFab';
-import { Filters } from '../../src/components/Filters';
-import { CATEGORIES, CategoryFilter } from '../../src/data/categories';
-import { CATEGORY_COLORS } from '../../src/data/colors';
-import { useVendorStore } from '../../src/store/vendorStore';
+import { Search } from "../../src/components/Search";
+import { SearchBar } from "../../src/components/SearchBar";
+import { useLocation } from "../../src/hooks/useLocation";
+import { useMapCamera } from "../../src/hooks/useMapCamera";
+import { GoToLocationFab } from "../../src/components/goToLocationFab";
+import { Filters } from "../../src/components/Filters";
+import { CATEGORIES, CategoryFilter } from "../../src/data/categories";
+import { CATEGORY_COLORS } from "../../src/data/colors";
+import { useVendorStore } from "../../src/store/vendorStore";
+import SiteInfoModal from "../../src/components/SiteInfo";
+import { Vendor } from "../../src/types";
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
   const { location, setLocation, loading } = useLocation();
   const { centerOn } = useMapCamera(mapRef);
 
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+
   const [jumping, setJumping] = useState(false);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [categories, setCategories] = useState<CategoryFilter[]>(() =>
     CATEGORIES.map((category) => ({ ...category }))
   );
@@ -37,7 +55,10 @@ export default function MapScreen() {
   );
 
   const activeCategories = useMemo(
-    () => categories.filter((category) => category.active).map((category) => category.name),
+    () =>
+      categories
+        .filter((category) => category.active)
+        .map((category) => category.name),
     [categories]
   );
 
@@ -45,20 +66,25 @@ export default function MapScreen() {
     const normalizedSearch = searchText.trim().toLowerCase();
     return vendors.filter((vendor) => {
       const matchesCategory =
-        activeCategories.length === 0 || activeCategories.includes(vendor.category);
+        activeCategories.length === 0 ||
+        activeCategories.includes(vendor.category);
       if (!matchesCategory) return false;
 
       if (!normalizedSearch) return true;
 
-      const searchableText = `${vendor.name} ${vendor.description ?? ''} ${vendor.category}`.toLowerCase();
+      const searchableText = `${vendor.name} ${vendor.description ?? ""} ${
+        vendor.category
+      }`.toLowerCase();
       return searchableText.includes(normalizedSearch);
     });
   }, [searchText, activeCategories, vendors]);
 
-  const handleToggleCategory = (categoryName: CategoryFilter['name']) => {
+  const handleToggleCategory = (categoryName: CategoryFilter["name"]) => {
     setCategories((prev) =>
       prev.map((category) =>
-        category.name === categoryName ? { ...category, active: !category.active } : category
+        category.name === categoryName
+          ? { ...category, active: !category.active }
+          : category
       )
     );
   };
@@ -84,34 +110,45 @@ export default function MapScreen() {
     try {
       setJumping(true);
       const { status } = await Location.getForegroundPermissionsAsync();
-      if (status !== 'granted') {
+      if (status !== "granted") {
         const req = await Location.requestForegroundPermissionsAsync();
-        if (req.status !== 'granted') {
-          Alert.alert('Sin permisos', 'No puedo acceder a tu ubicación.');
+        if (req.status !== "granted") {
+          Alert.alert("Sin permisos", "No puedo acceder a tu ubicación.");
           setJumping(false);
           return;
         }
       }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+      const pos = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+      });
       setLocation(pos.coords);
       centerOn(pos.coords.latitude, pos.coords.longitude, true);
     } catch (e) {
-      Alert.alert('Error', 'No se pudo obtener tu ubicación.');
+      Alert.alert("Error", "No se pudo obtener tu ubicación.");
     } finally {
       setJumping(false);
     }
   }, [centerOn]);
 
+  const showModal = (vendor: Vendor) => {
+    setSelectedVendor(vendor);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   if (loading) return <ActivityIndicator style={{ flex: 1 }} size="large" />;
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
       <View style={styles.container}>
         <MapView
           ref={mapRef}
           style={styles.map}
           showsUserLocation
-          showsMyLocationButton={Platform.OS === 'android'}
+          showsMyLocationButton={Platform.OS === "android"}
           initialRegion={userRegion ?? feriaFallbackRegion}
         >
           {location && (
@@ -130,18 +167,21 @@ export default function MapScreen() {
               title={vendor.name}
               description={vendor.description}
               pinColor={CATEGORY_COLORS[vendor.category]}
+              onPress={() => showModal(vendor)}
             />
           ))}
         </MapView>
         <Search>
           <View style={styles.searchHeader}>
             <Text style={styles.title}>Feria 16 de Julio</Text>
-            <Text style={styles.subtitle}>Explora los puestos y filtra por lo que necesitas.</Text>
+            <Text style={styles.subtitle}>
+              Explora los puestos y filtra por lo que necesitas.
+            </Text>
           </View>
           <SearchBar
             value={searchText}
             onChange={setSearchText}
-            onClear={() => setSearchText('')}
+            onClear={() => setSearchText("")}
             placeholder="Buscar por nombre o categoría"
             style={styles.searchBar}
           />
@@ -151,64 +191,72 @@ export default function MapScreen() {
           <View style={styles.resultsRow}>
             <View style={styles.resultsDot} />
             <Text style={styles.resultsText}>
-              {filteredVendors.length}{' '}
-              {filteredVendors.length === 1 ? 'puesto disponible' : 'puestos disponibles'}
+              {filteredVendors.length}{" "}
+              {filteredVendors.length === 1
+                ? "puesto disponible"
+                : "puestos disponibles"}
             </Text>
           </View>
           {filteredVendors.length === 0 && (
             <Text style={styles.emptyState}>
-              No encontramos resultados. Ajusta tu búsqueda o prueba con otra categoría.
+              No encontramos resultados. Ajusta tu búsqueda o prueba con otra
+              categoría.
             </Text>
           )}
         </Search>
         <GoToLocationFab goToMyLocation={goToMyLocation} jumping={jumping} />
+        <SiteInfoModal
+          visible={modalVisible}
+          onClose={closeModal}
+          vendor={selectedVendor}
+        />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
   container: { flex: 1 },
   map: { flex: 1 },
   searchHeader: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#0f172a'
+    fontWeight: "700",
+    color: "#0f172a",
   },
   subtitle: {
     marginTop: 4,
     fontSize: 13,
-    color: '#475569'
+    color: "#475569",
   },
   searchBar: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   filtersWrapper: {
-    marginBottom: 12
+    marginBottom: 12,
   },
   resultsRow: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: "row",
+    alignItems: "center",
   },
   resultsDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#0ea5e9',
-    marginRight: 8
+    backgroundColor: "#0ea5e9",
+    marginRight: 8,
   },
   resultsText: {
     fontSize: 13,
-    color: '#334155',
-    fontWeight: '500'
+    color: "#334155",
+    fontWeight: "500",
   },
   emptyState: {
     marginTop: 10,
     fontSize: 12,
-    color: '#94a3b8'
-  }
+    color: "#94a3b8",
+  },
 });

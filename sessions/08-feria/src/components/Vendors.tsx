@@ -1,19 +1,22 @@
-import { FlatList } from "react-native"
-import { VENDORS } from "../data/vendors"
-import { VendorCard } from "./Vendor"
+import { FlatList } from "react-native";
+import { VendorCard } from "./Vendor";
+import { useVendorStore } from "../store/vendorStore";
+import { Vendor } from "../types";
 
 export const Vendors = () => {
-    const renderItemData = ({item}: {item: typeof VENDORS[0]}) => (
+    const vendors = useVendorStore((state) => state.vendors);
+
+    const renderItemData = ({ item }: { item: Vendor }) => (
         <VendorCard vendor={item} />
-    )
+    );
 
     return (
         <>
             <FlatList
-                data={VENDORS}
+                data={vendors}
                 renderItem={renderItemData}
-                keyExtractor={item => item.id}
+                keyExtractor={(item) => item.id}
             />
         </>
-    )
-}
+    );
+};

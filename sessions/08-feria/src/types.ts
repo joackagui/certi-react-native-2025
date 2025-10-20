@@ -14,7 +14,7 @@ export type Vendor = {
     id: string;
     name: string;
     lat: number;
-    log: number;
+    lng: number;
     category: Category;
     schedule: Schedule;
     description: string;

@@ -1,5 +1,5 @@
 import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
-import { StyleSheet, ActivityIndicator, View, Platform, Alert, Text } from 'react-native';
+import { StyleSheet, ActivityIndicator, View, Platform, Alert, Text, Modal, Pressable } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,12 +13,15 @@ import { Filters } from '../../src/components/Filters';
 import { CATEGORIES, CategoryFilter } from '../../src/data/categories';
 import { CATEGORY_COLORS } from '../../src/data/colors';
 import { useVendorStore } from '../../src/store/vendorStore';
+import { Vendor } from '../../src/types';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
   const { location, setLocation, loading } = useLocation();
   const { centerOn } = useMapCamera(mapRef);
 
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [jumping, setJumping] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [categories, setCategories] = useState<CategoryFilter[]>(() =>
@@ -104,6 +107,12 @@ export default function MapScreen() {
 
   if (loading) return <ActivityIndicator style={{ flex: 1 }} size="large" />;
 
+  const selectVendor = (vendor: Vendor) => {
+    console.log('Pressed vendor:', vendor);
+    setSelectedVendor(vendor);
+    console.log('Pressed vendor:', selectedVendor);
+    setShowModal(true);
+  }
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <View style={styles.container}>
@@ -130,6 +139,7 @@ export default function MapScreen() {
               title={vendor.name}
               description={vendor.description}
               pinColor={CATEGORY_COLORS[vendor.category]}
+              onPress={() => { selectVendor(vendor) }}
             />
           ))}
         </MapView>
@@ -161,6 +171,25 @@ export default function MapScreen() {
             </Text>
           )}
         </Search>
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={showModal}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+            setShowModal(!showModal);
+          }}>
+          <View style={styles.centeredView}>
+            <View style={styles.modalView}>
+              <Text style={styles.modalText}>Hello World!</Text>
+              <Pressable
+                style={[styles.button, styles.buttonClose]}
+                onPress={() => setShowModal(!showModal)}>
+                <Text style={styles.textStyle}>Hide Modal</Text>
+              </Pressable>
+            </View>
+          </View>
+        </Modal>
         <GoToLocationFab goToMyLocation={goToMyLocation} jumping={jumping} />
       </View>
     </SafeAreaView>
@@ -210,5 +239,28 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontSize: 12,
     color: '#94a3b8'
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingBottom: 82,
+  }, 
+  modalView: {
+    flex: 1/30,
+    backgroundColor: 'white',
+    width: '100%'
+  },
+  modalText: {
+
+  },
+  button: {
+
+  },
+  buttonClose: {
+
+  },
+  textStyle: { 
+
   }
 });

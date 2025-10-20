@@ -11,15 +11,19 @@ export const Search: React.FC<{ children: React.ReactNode }>
 const styles = StyleSheet.create({
     card: {
         position: "absolute",
-        top: 16,
-        left: 12,
-        right: 12,
-        backgroundColor: "rgba(255,255,255,0.96)",
-        borderRadius: 20,
-        padding: 12,
-        shadowColor: "#000",
-        shadowOpacity: 0.2,
-        shadowRadius: 12,
-        elevation: 6
+        top: 20,
+        left: 16,
+        right: 16,
+        backgroundColor: "rgba(255,255,255,0.98)",
+        borderRadius: 26,
+        paddingHorizontal: 18,
+        paddingVertical: 20,
+        shadowColor: "#0f172a",
+        shadowOpacity: 0.18,
+        shadowRadius: 22,
+        shadowOffset: { width: 0, height: 12 },
+        borderColor: "rgba(148, 163, 184, 0.2)",
+        borderWidth: 1,
+        elevation: 12
     }
 });

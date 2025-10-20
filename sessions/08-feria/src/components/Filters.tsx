@@ -1,44 +1,35 @@
-import { View, StyleSheet } from 'react-native';
-import { CATEGORIES } from '../data/categories';
-import React, { useState } from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
+import { CategoryFilter } from '../data/categories';
+import React from 'react';
 import { Filter } from './Filter';
-export const Filters = () => {
-    const [categories, setCategories] = useState(CATEGORIES);
 
-    const selectCategory = (currentCategory: { name: string, active: boolean }) => {
-        setCategories(categories.map((category) => {
-            return (currentCategory.name === category.name) ?
-                { name: category.name, active: !category.active } 
-                : category;
+type FiltersProps = {
+    categories: CategoryFilter[];
+    onToggle: (categoryName: CategoryFilter['name']) => void;
+};
 
-        }))
-
-    }
-    return (
-        <View style={styles.container}>
-            {
-                categories.length > 0 && categories.map(
-                    (category, index) => {
-                        return (
-                            <Filter
-                                cat={category}
-                                index={index}
-                                selectCategory={selectCategory}
-                            />
-                        )
-
-                    }
-                )
-            }
-        </View>
-    )
-}
+export const Filters: React.FC<FiltersProps> = ({ categories, onToggle }) => (
+    <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.content}
+    >
+        {categories.map((category) => (
+            <Filter
+                key={category.name}
+                cat={category}
+                onToggle={onToggle}
+            />
+        ))}
+    </ScrollView>
+);
 
 const styles = StyleSheet.create({
-    container: {
-        marginTop: 20,
-        marginLeft: 5,
+    content: {
+        paddingTop: 4,
+        paddingBottom: 2,
+        paddingHorizontal: 2,
         flexDirection: 'row',
-        flexWrap: 'wrap'
+        alignItems: 'center'
     }
-})
+});

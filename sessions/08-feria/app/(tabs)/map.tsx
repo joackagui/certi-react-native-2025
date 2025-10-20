@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { StyleSheet, ActivityIndicator, Pressable, View, Platform, Alert, Text } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useRef, useState, useCallback, useMemo, useEffect } from 'react';
+import { StyleSheet, ActivityIndicator, View, Platform, Alert, Text } from 'react-native';
+import MapView, { Marker, Region } from 'react-native-maps';
 import * as Location from 'expo-location';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -10,6 +10,9 @@ import { useLocation } from '../../src/hooks/useLocation';
 import { useMapCamera } from '../../src/hooks/useMapCamera';
 import { GoToLocationFab } from '../../src/components/goToLocationFab';
 import { Filters } from '../../src/components/Filters';
+import { CATEGORIES, CategoryFilter } from '../../src/data/categories';
+import { CATEGORY_COLORS } from '../../src/data/colors';
+import { useVendorStore } from '../../src/store/vendorStore';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
@@ -18,6 +21,64 @@ export default function MapScreen() {
 
   const [jumping, setJumping] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [categories, setCategories] = useState<CategoryFilter[]>(() =>
+    CATEGORIES.map((category) => ({ ...category }))
+  );
+  const vendors = useVendorStore((state) => state.vendors);
+  const hasCenteredToUser = useRef(false);
+  const feriaFallbackRegion = useMemo<Region>(
+    () => ({
+      latitude: -16.5059,
+      longitude: -68.1636,
+      latitudeDelta: 0.03,
+      longitudeDelta: 0.03,
+    }),
+    []
+  );
+
+  const activeCategories = useMemo(
+    () => categories.filter((category) => category.active).map((category) => category.name),
+    [categories]
+  );
+
+  const filteredVendors = useMemo(() => {
+    const normalizedSearch = searchText.trim().toLowerCase();
+    return vendors.filter((vendor) => {
+      const matchesCategory =
+        activeCategories.length === 0 || activeCategories.includes(vendor.category);
+      if (!matchesCategory) return false;
+
+      if (!normalizedSearch) return true;
+
+      const searchableText = `${vendor.name} ${vendor.description ?? ''} ${vendor.category}`.toLowerCase();
+      return searchableText.includes(normalizedSearch);
+    });
+  }, [searchText, activeCategories, vendors]);
+
+  const handleToggleCategory = (categoryName: CategoryFilter['name']) => {
+    setCategories((prev) =>
+      prev.map((category) =>
+        category.name === categoryName ? { ...category, active: !category.active } : category
+      )
+    );
+  };
+
+  const userRegion = useMemo<Region | null>(() => {
+    if (!location) return null;
+    return {
+      latitude: location.latitude,
+      longitude: location.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+  }, [location]);
+
+  useEffect(() => {
+    if (userRegion && !hasCenteredToUser.current) {
+      centerOn(userRegion.latitude, userRegion.longitude, false);
+      hasCenteredToUser.current = true;
+    }
+  }, [userRegion, centerOn]);
 
   const goToMyLocation = useCallback(async () => {
     try {
@@ -51,6 +112,7 @@ export default function MapScreen() {
           style={styles.map}
           showsUserLocation
           showsMyLocationButton={Platform.OS === 'android'}
+          initialRegion={userRegion ?? feriaFallbackRegion}
         >
           {location && (
             <Marker
@@ -61,11 +123,43 @@ export default function MapScreen() {
               title="Estás aquí"
             />
           )}
+          {filteredVendors.map((vendor) => (
+            <Marker
+              key={vendor.id}
+              coordinate={{ latitude: vendor.lat, longitude: vendor.lng }}
+              title={vendor.name}
+              description={vendor.description}
+              pinColor={CATEGORY_COLORS[vendor.category]}
+            />
+          ))}
         </MapView>
         <Search>
-          <Text>Feria 16 de Julio</Text>
-          <SearchBar value={searchText} onChange={setSearchText} />
-          <Filters/>
+          <View style={styles.searchHeader}>
+            <Text style={styles.title}>Feria 16 de Julio</Text>
+            <Text style={styles.subtitle}>Explora los puestos y filtra por lo que necesitas.</Text>
+          </View>
+          <SearchBar
+            value={searchText}
+            onChange={setSearchText}
+            onClear={() => setSearchText('')}
+            placeholder="Buscar por nombre o categoría"
+            style={styles.searchBar}
+          />
+          <View style={styles.filtersWrapper}>
+            <Filters categories={categories} onToggle={handleToggleCategory} />
+          </View>
+          <View style={styles.resultsRow}>
+            <View style={styles.resultsDot} />
+            <Text style={styles.resultsText}>
+              {filteredVendors.length}{' '}
+              {filteredVendors.length === 1 ? 'puesto disponible' : 'puestos disponibles'}
+            </Text>
+          </View>
+          {filteredVendors.length === 0 && (
+            <Text style={styles.emptyState}>
+              No encontramos resultados. Ajusta tu búsqueda o prueba con otra categoría.
+            </Text>
+          )}
         </Search>
         <GoToLocationFab goToMyLocation={goToMyLocation} jumping={jumping} />
       </View>
@@ -77,4 +171,44 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1 },
   map: { flex: 1 },
+  searchHeader: {
+    marginBottom: 12
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#0f172a'
+  },
+  subtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#475569'
+  },
+  searchBar: {
+    marginBottom: 12
+  },
+  filtersWrapper: {
+    marginBottom: 12
+  },
+  resultsRow: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  resultsDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#0ea5e9',
+    marginRight: 8
+  },
+  resultsText: {
+    fontSize: 13,
+    color: '#334155',
+    fontWeight: '500'
+  },
+  emptyState: {
+    marginTop: 10,
+    fontSize: 12,
+    color: '#94a3b8'
+  }
 });

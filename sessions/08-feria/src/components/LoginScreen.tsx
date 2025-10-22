@@ -16,6 +16,7 @@ import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { emailSignIn } from "../services/loginEmail";
 import { GoogleButton } from "./GoogleButton";
+import { createUser, createUserByUid } from "../services/userService";
 
 export const LoginScreen: React.FC = () => {
     const router = useRouter();
@@ -29,7 +30,12 @@ export const LoginScreen: React.FC = () => {
         try {
             console.log(email);
             console.log(password);
-            await emailSignIn(email.trim(), password);
+            const { user }  = await emailSignIn(email.trim(), password);
+            
+            console.log(JSON.stringify(user))
+
+            await createUserByUid({uid: user.uid, email: user.email, role: 'client'})
+            // console.log(user);
             router.replace("/map");
         } catch (e: any) {
             setMsg(e.message);

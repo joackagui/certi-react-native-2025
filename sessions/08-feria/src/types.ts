@@ -22,4 +22,10 @@ export type Vendor = {
     liked?: boolean;
 }
 
+export type User = {
+    uid: string;
+    email: string;
+    role: string;
+}
+
 export type LocationCoord = { latitude: number; longitude: number; };

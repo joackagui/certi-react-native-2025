@@ -5,6 +5,7 @@ import {
   setLogLevel,
 } from "firebase/firestore";
 import { getFirebaseConfig } from "../services/firebaseConfig";
+import { getAuth } from "firebase/auth";
 
 if (__DEV__) setLogLevel("debug");
 
@@ -16,3 +17,5 @@ export const db = apps.length
   : initializeFirestore(app, {
       experimentalForceLongPolling: true,
     });
+
+export const auth = getAuth(app);

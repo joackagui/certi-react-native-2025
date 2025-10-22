@@ -30,7 +30,8 @@
       "expo-router"
     ],
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-web-browser"
     ]
   }
 }

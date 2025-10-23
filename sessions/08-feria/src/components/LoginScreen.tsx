@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import {
+    ActivityIndicator,
+    Alert,
     KeyboardAvoidingView,
     Platform,
     ScrollView,
@@ -14,29 +16,56 @@ import Svg, { Path } from "react-native-svg";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { emailSignIn } from "../services/loginEmail";
+import { emailSignIn, resetPassword } from "../services/loginEmail";
 import { GoogleButton } from "./GoogleButton";
-import { createUser, createUserByUid } from "../services/userService";
+import { createUserByUid } from "../services/userService";
 
 export const LoginScreen: React.FC = () => {
     const router = useRouter();
-    const [email, setEmail] = useState("paul@gmail.com");
-    const [password, setPassword] = useState("123456");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
     const [rememberMe, setRememberMe] = useState(false);
     const [secureEntry, setSecureEntry] = useState(true);
-    const [msg, setMsg] = useState("");
+    const [message, setMessage] = useState<string | null>(null);
+    const [messageTone, setMessageTone] = useState<"error" | "success">("error");
+    const [submitting, setSubmitting] = useState(false);
 
     const handleLogin = async () => {
+        if (submitting) return;
+        setMessage(null);
         try {
-            console.log(email);
-            console.log(password);
+            setSubmitting(true);
             const { user } = await emailSignIn(email.trim(), password);
             await createUserByUid({ uid: user.uid, email: user.email, role: 'client' })
             router.replace("/map");
         } catch (e: any) {
-            setMsg(e.message);
+            setMessageTone("error");
+            setMessage(e?.message ?? "No se pudo iniciar sesión.");
             console.log(e);
+        } finally {
+            setSubmitting(false);
         }
+    };
+
+    const handleForgotPassword = async () => {
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail) {
+            Alert.alert("Ingresa tu correo", "Necesitamos tu email para enviarte el enlace.");
+            return;
+        }
+        try {
+            await resetPassword(trimmedEmail);
+            setMessageTone("success");
+            setMessage("Te enviamos un correo para restablecer tu contraseña.");
+        } catch (error: any) {
+            setMessageTone("error");
+            setMessage(error?.message ?? "No pudimos enviar el correo de recuperación.");
+        }
+    };
+
+    const goToSignUp = () => {
+        if (submitting) return;
+        router.push("/signup");
     };
 
     return (
@@ -107,6 +136,18 @@ export const LoginScreen: React.FC = () => {
                                             </Pressable>
                                         </View>
                                     </View>
+                                    {message && (
+                                        <Text
+                                            style={[
+                                                styles.feedback,
+                                                messageTone === "error"
+                                                    ? styles.feedbackError
+                                                    : styles.feedbackSuccess
+                                            ]}
+                                        >
+                                            {message}
+                                        </Text>
+                                    )}
                                     <View style={styles.rememberRow}>
                                         <View style={styles.rememberToggle}>
                                             <Switch
@@ -117,17 +158,25 @@ export const LoginScreen: React.FC = () => {
                                             />
                                             <Text style={styles.rememberLabel}>Remember Me</Text>
                                         </View>
-                                        <Pressable>
+                                        <Pressable onPress={handleForgotPassword} disabled={submitting}>
                                             <Text style={styles.linkMuted}>Forgot Password?</Text>
                                         </Pressable>
                                     </View>
-                                    <Pressable style={styles.loginButton} onPress={handleLogin}>
-                                        <Text style={styles.loginButtonLabel}>Login</Text>
+                                    <Pressable
+                                        style={[styles.loginButton, submitting && styles.loginButtonDisabled]}
+                                        onPress={handleLogin}
+                                        disabled={submitting}
+                                    >
+                                        {submitting ? (
+                                            <ActivityIndicator color="#ffffff" />
+                                        ) : (
+                                            <Text style={styles.loginButtonLabel}>Login</Text>
+                                        )}
                                     </Pressable>
                                     {/* <GoogleButton /> */}
                                     <View style={styles.footerRow}>
                                         <Text style={styles.footerText}>Don’t have an account?</Text>
-                                        <Pressable>
+                                        <Pressable onPress={goToSignUp}>
                                             <Text style={styles.linkPrimary}> Sign up</Text>
                                         </Pressable>
                                     </View>
@@ -251,6 +300,9 @@ const styles = StyleSheet.create({
         elevation: 4,
         marginBottom: 24
     },
+    loginButtonDisabled: {
+        opacity: 0.7
+    },
     loginButtonLabel: {
         color: "#ffffff",
         fontSize: 16,
@@ -269,5 +321,16 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "#f9738f",
         fontWeight: "600"
+    },
+    feedback: {
+        fontSize: 14,
+        marginBottom: 16,
+        textAlign: "center"
+    },
+    feedbackError: {
+        color: "#dc2626"
+    },
+    feedbackSuccess: {
+        color: "#16a34a"
     }
 });

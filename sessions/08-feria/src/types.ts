@@ -26,6 +26,7 @@ export type User = {
     uid: string;
     email: string;
     role: string;
+    photoUrl?: string;
 }
 
 export type LocationCoord = { latitude: number; longitude: number; };

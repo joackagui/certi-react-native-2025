@@ -76,136 +76,138 @@ export const SignUpScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <View style={styles.surface}>
-                <KeyboardAvoidingView
-                    style={{ flex: 1 }}
-                    behavior={Platform.OS === "ios" ? "padding" : undefined}
-                >
-                    <ScrollView
-                        style={styles.scroll}
-                        contentContainerStyle={styles.content}
-                        keyboardShouldPersistTaps="handled"
-                        showsVerticalScrollIndicator={false}
+        <View style={{ flex: 1, backgroundColor: "#f9738f" }}>
+            <SafeAreaView style={styles.safeArea} edges={["top"]}>
+                <View style={styles.surface}>
+                    <KeyboardAvoidingView
+                        style={{ flex: 1 }}
+                        behavior={Platform.OS === "ios" ? "padding" : undefined}
                     >
-                        <View style={styles.hero}>
-                            <Svg width="100%" height="180" viewBox="0 0 375 180">
-                                <Path
-                                    d="M0 0H375V120C281.667 180 93.3333 180 0 120V0Z"
-                                    fill="#f9738f"
-                                />
-                            </Svg>
-                            <View style={styles.heroPattern} />
-                        </View>
-                        <View style={styles.formSection}>
-                            <View style={styles.formWrapper}>
-                                <Text style={styles.title}>Crear cuenta</Text>
-                                <View style={styles.titleAccent} />
-                                <View style={styles.fieldContainer}>
-                                    <Text style={styles.label}>Email</Text>
-                                    <View style={styles.inputWrapper}>
-                                        <Ionicons name="mail-outline" size={18} color="#f9738f" />
-                                        <TextInput
-                                            style={styles.input}
-                                            value={email}
-                                            onChangeText={setEmail}
-                                            placeholder="tucorreo@email.com"
-                                            placeholderTextColor="#cbd5f5"
-                                            keyboardType="email-address"
-                                            autoCapitalize="none"
-                                            textContentType="emailAddress"
-                                        />
-                                    </View>
-                                </View>
-                                <View style={styles.fieldContainer}>
-                                    <Text style={styles.label}>Contraseña</Text>
-                                    <View style={styles.inputWrapper}>
-                                        <Ionicons name="lock-closed-outline" size={18} color="#f9738f" />
-                                        <TextInput
-                                            style={styles.input}
-                                            value={password}
-                                            onChangeText={setPassword}
-                                            placeholder="Crea tu contraseña"
-                                            placeholderTextColor="#cbd5f5"
-                                            secureTextEntry={secureEntry}
-                                            textContentType="password"
-                                        />
-                                        <Pressable
-                                            onPress={() => setSecureEntry((prev) => !prev)}
-                                            hitSlop={8}
-                                        >
-                                            <Ionicons
-                                                name={secureEntry ? "eye-off-outline" : "eye-outline"}
-                                                size={18}
-                                                color="#f9738f"
+                        <ScrollView
+                            style={styles.scroll}
+                            contentContainerStyle={styles.content}
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <View style={styles.hero}>
+                                <Svg width="100%" height="180" viewBox="0 0 375 180">
+                                    <Path
+                                        d="M0 0H375V120C281.667 180 93.3333 180 0 120V0Z"
+                                        fill="#f9738f"
+                                    />
+                                </Svg>
+                                <View style={styles.heroPattern} />
+                            </View>
+                            <View style={styles.formSection}>
+                                <View style={styles.formWrapper}>
+                                    <Text style={styles.title}>Crear cuenta</Text>
+                                    <View style={styles.titleAccent} />
+                                    <View style={styles.fieldContainer}>
+                                        <Text style={styles.label}>Email</Text>
+                                        <View style={styles.inputWrapper}>
+                                            <Ionicons name="mail-outline" size={18} color="#f9738f" />
+                                            <TextInput
+                                                style={styles.input}
+                                                value={email}
+                                                onChangeText={setEmail}
+                                                placeholder="tucorreo@email.com"
+                                                placeholderTextColor="#cbd5f5"
+                                                keyboardType="email-address"
+                                                autoCapitalize="none"
+                                                textContentType="emailAddress"
                                             />
-                                        </Pressable>
+                                        </View>
                                     </View>
-                                </View>
-                                <View style={styles.fieldContainer}>
-                                    <Text style={styles.label}>Confirmar contraseña</Text>
-                                    <View style={styles.inputWrapper}>
-                                        <Ionicons name="shield-checkmark-outline" size={18} color="#f9738f" />
-                                        <TextInput
-                                            style={styles.input}
-                                            value={confirmPassword}
-                                            onChangeText={setConfirmPassword}
-                                            placeholder="Repite tu contraseña"
-                                            placeholderTextColor="#cbd5f5"
-                                            secureTextEntry={secureConfirmEntry}
-                                        />
-                                        <Pressable
-                                            onPress={() => setSecureConfirmEntry((prev) => !prev)}
-                                            hitSlop={8}
-                                        >
-                                            <Ionicons
-                                                name={secureConfirmEntry ? "eye-off-outline" : "eye-outline"}
-                                                size={18}
-                                                color="#f9738f"
+                                    <View style={styles.fieldContainer}>
+                                        <Text style={styles.label}>Contraseña</Text>
+                                        <View style={styles.inputWrapper}>
+                                            <Ionicons name="lock-closed-outline" size={18} color="#f9738f" />
+                                            <TextInput
+                                                style={styles.input}
+                                                value={password}
+                                                onChangeText={setPassword}
+                                                placeholder="Crea tu contraseña"
+                                                placeholderTextColor="#cbd5f5"
+                                                secureTextEntry={secureEntry}
+                                                textContentType="password"
                                             />
-                                        </Pressable>
+                                            <Pressable
+                                                onPress={() => setSecureEntry((prev) => !prev)}
+                                                hitSlop={8}
+                                            >
+                                                <Ionicons
+                                                    name={secureEntry ? "eye-off-outline" : "eye-outline"}
+                                                    size={18}
+                                                    color="#f9738f"
+                                                />
+                                            </Pressable>
+                                        </View>
                                     </View>
-                                </View>
-                                {message && (
-                                    <Text
-                                        style={[
-                                            styles.feedback,
-                                            messageTone === "error" ? styles.feedbackError : styles.feedbackSuccess
-                                        ]}
-                                    >
-                                        {message}
-                                    </Text>
-                                )}
-                                <Pressable
-                                    style={[styles.actionButton, submitting && styles.actionButtonDisabled]}
-                                    onPress={handleSignUp}
-                                    disabled={submitting}
-                                >
-                                    {submitting ? (
-                                        <ActivityIndicator color="#ffffff" />
-                                    ) : (
-                                        <Text style={styles.actionLabel}>Crear cuenta</Text>
+                                    <View style={styles.fieldContainer}>
+                                        <Text style={styles.label}>Confirmar contraseña</Text>
+                                        <View style={styles.inputWrapper}>
+                                            <Ionicons name="shield-checkmark-outline" size={18} color="#f9738f" />
+                                            <TextInput
+                                                style={styles.input}
+                                                value={confirmPassword}
+                                                onChangeText={setConfirmPassword}
+                                                placeholder="Repite tu contraseña"
+                                                placeholderTextColor="#cbd5f5"
+                                                secureTextEntry={secureConfirmEntry}
+                                            />
+                                            <Pressable
+                                                onPress={() => setSecureConfirmEntry((prev) => !prev)}
+                                                hitSlop={8}
+                                            >
+                                                <Ionicons
+                                                    name={secureConfirmEntry ? "eye-off-outline" : "eye-outline"}
+                                                    size={18}
+                                                    color="#f9738f"
+                                                />
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                    {message && (
+                                        <Text
+                                            style={[
+                                                styles.feedback,
+                                                messageTone === "error" ? styles.feedbackError : styles.feedbackSuccess
+                                            ]}
+                                        >
+                                            {message}
+                                        </Text>
                                     )}
-                                </Pressable>
-                                <View style={styles.footerRow}>
-                                    <Text style={styles.footerText}>¿Ya tienes una cuenta?</Text>
-                                    <Pressable onPress={goToLogin}>
-                                        <Text style={styles.linkPrimary}> Inicia sesión</Text>
+                                    <Pressable
+                                        style={[styles.actionButton, submitting && styles.actionButtonDisabled]}
+                                        onPress={handleSignUp}
+                                        disabled={submitting}
+                                    >
+                                        {submitting ? (
+                                            <ActivityIndicator color="#ffffff" />
+                                        ) : (
+                                            <Text style={styles.actionLabel}>Crear cuenta</Text>
+                                        )}
                                     </Pressable>
+                                    <View style={styles.footerRow}>
+                                        <Text style={styles.footerText}>¿Ya tienes una cuenta?</Text>
+                                        <Pressable onPress={goToLogin}>
+                                            <Text style={styles.linkPrimary}> Inicia sesión</Text>
+                                        </Pressable>
+                                    </View>
                                 </View>
                             </View>
-                        </View>
-                    </ScrollView>
-                </KeyboardAvoidingView>
-            </View>
-        </SafeAreaView>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                </View>
+            </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
-        backgroundColor: "#f9738f"
+        backgroundColor: "transparent"
     },
     surface: {
         flex: 1,

@@ -1,5 +1,5 @@
 import React from "react";
-import { LoginScreen } from "../src/components/LoginScreen";
+import { LoginScreen } from "../../src/components/LoginScreen";
 
 const LoginRoute = () => {
     return <LoginScreen />;

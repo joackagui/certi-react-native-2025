@@ -118,7 +118,7 @@ export default function MapScreen() {
     setSelectedVendor(null);
   };
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
         <MapView
           ref={mapRef}
@@ -190,7 +190,7 @@ export default function MapScreen() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
+  safeArea: { flex: 1, backgroundColor: 'transparente' },
   container: { flex: 1 },
   map: { flex: 1 },
   searchHeader: {

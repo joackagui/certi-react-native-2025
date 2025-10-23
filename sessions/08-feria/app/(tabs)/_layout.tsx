@@ -1,8 +1,25 @@
 import React from 'react';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
+import {View, Text} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../../src/auth/authProvider';
 
 const TabsLayout = () => {
+
+    const { user, loading } = useAuth();
+        if(loading) {
+            return (
+                <View>
+                    <Text> Cargando </Text>
+                </View>
+            )
+        }
+
+        if(!user) {
+            return <Redirect href="login"/>
+        }
+
+
     return <Tabs
         screenOptions={{
             headerShown: false,

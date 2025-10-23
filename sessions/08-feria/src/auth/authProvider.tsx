@@ -17,9 +17,10 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-
+  // verificar el estado del usuario logueado en firebase
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (u) => {
+      console.log('por aqui estoy--------->', u);
       setUser(u ?? null);
       setLoading(false);
     });

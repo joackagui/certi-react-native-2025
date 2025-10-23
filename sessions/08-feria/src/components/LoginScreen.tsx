@@ -20,8 +20,8 @@ import { createUser, createUserByUid } from "../services/userService";
 
 export const LoginScreen: React.FC = () => {
     const router = useRouter();
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    const [email, setEmail] = useState("paul@gmail.com");
+    const [password, setPassword] = useState("123456");
     const [rememberMe, setRememberMe] = useState(false);
     const [secureEntry, setSecureEntry] = useState(true);
     const [msg, setMsg] = useState("");
@@ -30,12 +30,8 @@ export const LoginScreen: React.FC = () => {
         try {
             console.log(email);
             console.log(password);
-            const { user }  = await emailSignIn(email.trim(), password);
-            
-            console.log(JSON.stringify(user))
-
-            await createUserByUid({uid: user.uid, email: user.email, role: 'client'})
-            // console.log(user);
+            const { user } = await emailSignIn(email.trim(), password);
+            await createUserByUid({ uid: user.uid, email: user.email, role: 'client' })
             router.replace("/map");
         } catch (e: any) {
             setMsg(e.message);
@@ -44,102 +40,117 @@ export const LoginScreen: React.FC = () => {
     };
 
     return (
-        <SafeAreaView style={styles.safeArea}>
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === "ios" ? "padding" : undefined}
-            >
-                <ScrollView
-                    contentContainerStyle={styles.content}
-                    keyboardShouldPersistTaps="handled"
-                    showsVerticalScrollIndicator={false}
-                >
-                    <View style={styles.hero}>
-                        <Svg width="100%" height="180" viewBox="0 0 375 180">
-                            <Path
-                                d="M0 0H375V120C281.667 180 93.3333 180 0 120V0Z"
-                                fill="#f9738f"
-                            />
-                        </Svg>
-                        <View style={styles.heroPattern} />
-                    </View>
-                    <View style={styles.formWrapper}>
-                        <Text style={styles.title}>Sign in</Text>
-                        <View style={styles.titleAccent} />
-                        <View style={styles.fieldContainer}>
-                            <Text style={styles.label}>Email</Text>
-                            <View style={styles.inputWrapper}>
-                                <Ionicons name="mail-outline" size={18} color="#f9738f" />
-                                <TextInput
-                                    style={styles.input}
-                                    value={email}
-                                    onChangeText={setEmail}
-                                    placeholder="demo@email.com"
-                                    placeholderTextColor="#cbd5f5"
-                                    keyboardType="email-address"
-                                    autoCapitalize="none"
-                                    textContentType="emailAddress"
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.fieldContainer}>
-                            <Text style={styles.label}>Password</Text>
-                            <View style={styles.inputWrapper}>
-                                <Ionicons name="lock-closed-outline" size={18} color="#f9738f" />
-                                <TextInput
-                                    style={styles.input}
-                                    value={password}
-                                    onChangeText={setPassword}
-                                    placeholder="Enter your password"
-                                    placeholderTextColor="#cbd5f5"
-                                    secureTextEntry={secureEntry}
-                                    textContentType="password"
-                                />
-                                <Pressable
-                                    onPress={() => setSecureEntry((prev) => !prev)}
-                                    hitSlop={8}
-                                >
-                                    <Ionicons
-                                        name={secureEntry ? "eye-off-outline" : "eye-outline"}
-                                        size={18}
-                                        color="#f9738f"
+        <View style={{ flex: 1, backgroundColor: "#f9738f" }}>
+            <SafeAreaView style={styles.safeArea} edges={["top"]}>
+                <View style={styles.surface}>
+                    <KeyboardAvoidingView
+                        style={{ flex: 1 }}
+                        behavior={Platform.OS === "ios" ? "padding" : undefined}
+                    >
+                        <ScrollView
+                            style={styles.scroll}
+                            contentContainerStyle={styles.content}
+                            keyboardShouldPersistTaps="handled"
+                            showsVerticalScrollIndicator={false}
+                        >
+                            <View style={styles.hero}>
+                                <Svg width="100%" height="180" viewBox="0 0 375 180">
+                                    <Path
+                                        d="M0 0H375V120C281.667 180 93.3333 180 0 120V0Z"
+                                        fill="#f9738f"
                                     />
-                                </Pressable>
+                                </Svg>
+                                <View style={styles.heroPattern} />
                             </View>
-                        </View>
-                        <View style={styles.rememberRow}>
-                            <View style={styles.rememberToggle}>
-                                <Switch
-                                    value={rememberMe}
-                                    onValueChange={setRememberMe}
-                                    trackColor={{ false: "#f1f5f9", true: "#f9738f" }}
-                                    thumbColor={rememberMe ? "#fef2f8" : "#ffffff"}
-                                />
-                                <Text style={styles.rememberLabel}>Remember Me</Text>
+                            <View style={styles.formSection}>
+                                <View style={styles.formWrapper}>
+                                    <Text style={styles.title}>Sign in</Text>
+                                    <View style={styles.titleAccent} />
+                                    <View style={styles.fieldContainer}>
+                                        <Text style={styles.label}>Email</Text>
+                                        <View style={styles.inputWrapper}>
+                                            <Ionicons name="mail-outline" size={18} color="#f9738f" />
+                                            <TextInput
+                                                style={styles.input}
+                                                value={email}
+                                                onChangeText={setEmail}
+                                                placeholder="demo@email.com"
+                                                placeholderTextColor="#cbd5f5"
+                                                keyboardType="email-address"
+                                                autoCapitalize="none"
+                                                textContentType="emailAddress"
+                                            />
+                                        </View>
+                                    </View>
+                                    <View style={styles.fieldContainer}>
+                                        <Text style={styles.label}>Password</Text>
+                                        <View style={styles.inputWrapper}>
+                                            <Ionicons name="lock-closed-outline" size={18} color="#f9738f" />
+                                            <TextInput
+                                                style={styles.input}
+                                                value={password}
+                                                onChangeText={setPassword}
+                                                placeholder="Enter your password"
+                                                placeholderTextColor="#cbd5f5"
+                                                secureTextEntry={secureEntry}
+                                                textContentType="password"
+                                            />
+                                            <Pressable
+                                                onPress={() => setSecureEntry((prev) => !prev)}
+                                                hitSlop={8}
+                                            >
+                                                <Ionicons
+                                                    name={secureEntry ? "eye-off-outline" : "eye-outline"}
+                                                    size={18}
+                                                    color="#f9738f"
+                                                />
+                                            </Pressable>
+                                        </View>
+                                    </View>
+                                    <View style={styles.rememberRow}>
+                                        <View style={styles.rememberToggle}>
+                                            <Switch
+                                                value={rememberMe}
+                                                onValueChange={setRememberMe}
+                                                trackColor={{ false: "#f1f5f9", true: "#f9738f" }}
+                                                thumbColor={rememberMe ? "#fef2f8" : "#ffffff"}
+                                            />
+                                            <Text style={styles.rememberLabel}>Remember Me</Text>
+                                        </View>
+                                        <Pressable>
+                                            <Text style={styles.linkMuted}>Forgot Password?</Text>
+                                        </Pressable>
+                                    </View>
+                                    <Pressable style={styles.loginButton} onPress={handleLogin}>
+                                        <Text style={styles.loginButtonLabel}>Login</Text>
+                                    </Pressable>
+                                    {/* <GoogleButton /> */}
+                                    <View style={styles.footerRow}>
+                                        <Text style={styles.footerText}>Don’t have an account?</Text>
+                                        <Pressable>
+                                            <Text style={styles.linkPrimary}> Sign up</Text>
+                                        </Pressable>
+                                    </View>
+                                </View>
                             </View>
-                            <Pressable>
-                                <Text style={styles.linkMuted}>Forgot Password?</Text>
-                            </Pressable>
-                        </View>
-                        <Pressable style={styles.loginButton} onPress={handleLogin}>
-                            <Text style={styles.loginButtonLabel}>Login</Text>
-                        </Pressable>
-                        {/* <GoogleButton /> */}
-                        <View style={styles.footerRow}>
-                            <Text style={styles.footerText}>Don’t have an account?</Text>
-                            <Pressable>
-                                <Text style={styles.linkPrimary}> Sign up</Text>
-                            </Pressable>
-                        </View>
-                    </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
-        </SafeAreaView>
+                        </ScrollView>
+                    </KeyboardAvoidingView>
+                </View>
+            </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     safeArea: {
+        flex: 1,
+        backgroundColor: "transparent"
+    },
+    surface: {
+        flex: 1,
+        backgroundColor: "#ffffff"
+    },
+    scroll: {
         flex: 1,
         backgroundColor: "#ffffff"
     },
@@ -154,6 +165,12 @@ const styles = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         opacity: 0.15,
         backgroundColor: "#f25d7e"
+    },
+    formSection: {
+        flex: 1,
+        flexGrow: 1,
+        backgroundColor: "#ffffff",
+        paddingBottom: 32
     },
     formWrapper: {
         marginTop: -36,

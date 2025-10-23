@@ -30,6 +30,32 @@ const TabsLayout = () => {
                 ),
             }}
         />
+        <Tabs.Screen
+            name="favorites"
+            options={{
+                title: 'Favoritos',
+                tabBarIcon: ({ color, focused, size }) => (
+                    <Ionicons
+                        name={focused ? 'heart' : 'heart-outline'}
+                        size={size}
+                        color={color}
+                    />
+                ),
+            }}
+        />
+        <Tabs.Screen
+            name="profile"
+            options={{
+                title: 'Perfil',
+                tabBarIcon: ({ color, focused, size }) => (
+                    <Ionicons
+                        name={focused ? 'person' : 'person-outline'}
+                        size={size}
+                        color={color}
+                    />
+                ),
+            }}
+        />
     </Tabs>
 };
 

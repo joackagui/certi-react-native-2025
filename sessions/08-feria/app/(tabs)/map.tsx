@@ -15,8 +15,6 @@ import { CATEGORY_COLORS } from '../../src/data/colors';
 import { useVendorStore } from '../../src/store/vendorStore';
 import { Vendor } from '../../src/types';
 import { VendorBottomSheet } from '../../src/components/VendorBottomSheet';
-import { logout } from '../../src/services/loginEmail';
-import { router } from 'expo-router';
 
 export default function MapScreen() {
   const mapRef = useRef<MapView>(null);
@@ -86,15 +84,8 @@ export default function MapScreen() {
     }
   }, [userRegion, centerOn]);
 
-  const logoutUser = ( ) => {
-    console.log('Logout')
-    logout();
-    router.replace('/login');
-  }
   const goToMyLocation = useCallback(async () => {
     try {
-      // Logout 
-      
       setJumping(true);
       const { status } = await Location.getForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -127,7 +118,7 @@ export default function MapScreen() {
     setSelectedVendor(null);
   };
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
       <View style={styles.container}>
         <MapView
           ref={mapRef}
@@ -192,14 +183,14 @@ export default function MapScreen() {
         >
           <VendorBottomSheet vendor={selectedVendor} visible={showModal} onClose={closeVendorModal} />
         </Modal>
-        <GoToLocationFab goToMyLocation={logoutUser} jumping={jumping} />
+        <GoToLocationFab goToMyLocation={goToMyLocation} jumping={jumping} />
       </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
+  safeArea: { flex: 1, backgroundColor: 'transparente' },
   container: { flex: 1 },
   map: { flex: 1 },
   searchHeader: {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Redirect, Tabs } from 'expo-router';
 import {View, Text} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +7,13 @@ import { useAuth } from '../../src/auth/authProvider';
 const TabsLayout = () => {
 
     const { user, loading } = useAuth();
+    useEffect(() => {
+        if (!loading) {
+            const role = user?.role ?? 'guest';
+            console.info(`[Tabs] Navegación cargada para rol ${role}.`);
+        }
+    }, [loading, user?.role]);
+
         if(loading) {
             return (
                 <View>
@@ -19,6 +26,7 @@ const TabsLayout = () => {
             return <Redirect href="login"/>
         }
 
+    const isAdmin = user.role === 'admin';
 
     return <Tabs
         screenOptions={{
@@ -73,6 +81,21 @@ const TabsLayout = () => {
                 ),
             }}
         />
+        { isAdmin && (
+            <Tabs.Screen
+                name="admin"
+                options={{
+                    title: 'Admin',
+                    tabBarIcon: ({ color, focused, size }) => (
+                        <Ionicons
+                            name={focused ? 'shield-checkmark' : 'shield-outline'}
+                            size={size}
+                            color={color}
+                        />
+                    ),
+                }}
+            />
+        )}
     </Tabs>
 };
 

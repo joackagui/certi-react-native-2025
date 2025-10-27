@@ -17,8 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { emailSignIn, resetPassword } from "../services/loginEmail";
-import { GoogleButton } from "./GoogleButton";
-import { createUserByUid } from "../services/userService";
+import { createUserByUid, getUserByUid } from "../services/userService";
 
 export const LoginScreen: React.FC = () => {
     const router = useRouter();
@@ -32,16 +31,32 @@ export const LoginScreen: React.FC = () => {
 
     const handleLogin = async () => {
         if (submitting) return;
+
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail || !password) {
+            setMessageTone("error");
+            setMessage("Ingresa tu correo y contraseña.");
+            return;
+        }
+
         setMessage(null);
         try {
             setSubmitting(true);
-            const { user } = await emailSignIn(email.trim(), password);
-            await createUserByUid({ uid: user.uid, email: user.email, role: 'client' })
+            const { user } = await emailSignIn(trimmedEmail, password);
+            const existingProfile = await getUserByUid(user.uid);
+            if (!existingProfile) {
+                await createUserByUid({ uid: user.uid, email: user.email ?? trimmedEmail, role: "client" });
+                console.info(`[Auth] Perfil creado para ${user.email ?? trimmedEmail} con rol client.`);
+            } else {
+                console.info(
+                    `[Auth] Perfil existente detectado para ${user.email ?? trimmedEmail} con rol ${existingProfile.role ?? "client"}.`
+                );
+            }
             router.replace("/map");
         } catch (e: any) {
             setMessageTone("error");
             setMessage(e?.message ?? "No se pudo iniciar sesión.");
-            console.log(e);
+            console.error("Login error", e);
         } finally {
             setSubmitting(false);
         }
@@ -173,7 +188,6 @@ export const LoginScreen: React.FC = () => {
                                             <Text style={styles.loginButtonLabel}>Login</Text>
                                         )}
                                     </Pressable>
-                                    {/* <GoogleButton /> */}
                                     <View style={styles.footerRow}>
                                         <Text style={styles.footerText}>Don’t have an account?</Text>
                                         <Pressable onPress={goToSignUp}>

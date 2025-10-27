@@ -1,9 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { User, onAuthStateChanged, signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../data/firebase";
+import { getUserByUid } from "../services/userService";
+
+type AppUser = {
+  uid: string;
+  email: string | null;
+  displayName: string | null;
+  photoUrl?: string | null;
+  role: string;
+};
 
 type AuthContextType = {
-  user: User | null;
+  user: AppUser | null;
   loading: boolean;
   logout: () => Promise<void>;
 };
@@ -15,19 +24,67 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AppUser | null>(null);
   const [loading, setLoading] = useState(true);
   // verificar el estado del usuario logueado en firebase
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (u) => {
-      console.log('por aqui estoy--------->', u);
-      setUser(u ?? null);
-      setLoading(false);
-    });
-    return unsub;
-  }, []);
+    let isMounted = true;
+    const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      if (!isMounted) return;
+      setLoading(true);
 
-  const logout = () => signOut(auth);
+      if (!firebaseUser) {
+        console.info("[Auth] Sesión cerrada.");
+        setUser(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const profile = await getUserByUid(firebaseUser.uid);
+        const role = profile?.role ?? "client";
+        const resolvedUser: AppUser = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoUrl: profile?.photoUrl ?? firebaseUser.photoURL ?? undefined,
+          role,
+        };
+        console.info(
+          `[Auth] Usuario ${resolvedUser.email ?? resolvedUser.uid} autenticado como ${role}.`
+        );
+        if (isMounted) {
+          setUser(resolvedUser);
+        }
+      } catch (error) {
+        console.error("[Auth] Error cargando perfil de usuario", error);
+        const fallbackUser: AppUser = {
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          displayName: firebaseUser.displayName,
+          photoUrl: firebaseUser.photoURL ?? undefined,
+          role: "client",
+        };
+        if (isMounted) {
+          setUser(fallbackUser);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    });
+    return () => {
+      isMounted = false;
+      unsub();
+    };
+  }, []);
+  // getUser uid 
+
+  const logout = async () => {
+    console.info("[Auth] Cerrando sesión solicitada por el usuario.");
+    await signOut(auth);
+  };
 
   return (
     <AuthContext.Provider value={{ user, loading, logout }}>

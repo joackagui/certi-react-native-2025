@@ -1,14 +1,8 @@
-import { addDoc, collection, doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { User } from "../types";
 import { db } from "../data/firebase";
 
 const USER_DOCUMENT = 'users';
-
-export const createUser = (user: User) => {
-    return addDoc(collection(db, USER_DOCUMENT ), {
-        ...user
-    });
-};
 
 export const createUserByUid = (user: User) => {
     return setDoc(doc(db, USER_DOCUMENT, user.uid ), {

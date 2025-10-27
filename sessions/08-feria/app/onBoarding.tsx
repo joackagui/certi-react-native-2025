@@ -6,6 +6,7 @@ import { router } from 'expo-router';
 const OnBoardingScreen = () => {
     const finish = () => {
         router.replace('/login');
+        
     }
     return (
         <Onboarding

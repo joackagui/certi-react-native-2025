@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "08-feria",
-    "slug": "08-feria",
+    "slug": "proyecto-feria",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,9 +28,13 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-web-browser"
-    ]
+    "plugins": ["expo-router", "expo-web-browser", "expo-notifications"],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "eaf6aa80-3525-4152-b4c2-879a9f89b6ed"
+      }
+    },
+    "owner": "joaquin_aguilera"
   }
 }

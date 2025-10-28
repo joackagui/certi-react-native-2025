@@ -10,9 +10,10 @@ import { usePushNotifications } from '../src/lib/usePushNotifications';
 export default function OnboardingScreen() {
     const router = useRouter();
     const { expoPushToken, notification, sendPushNotification, scheduleLocalNotification } = usePushNotifications();
+    
     const finish = useCallback(async () => {
         await AsyncStorage.setItem('hasSeenOnboarding', 'false');
-        sendPushNotification("ExponentPushToken[DionA6OB7wDUyfGzT4QgL5]");
+        sendPushNotification("ExponentPushToken[XGyrG0LsDxkHn1XRmCJIte]");
         console.log('Onboarding finished, navigating to login...');
 
         //router.replace('/login');

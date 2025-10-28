@@ -11,10 +11,10 @@ export default function HomeRedirect() {
     AsyncStorage.getItem('hasSeenOnboarding')
       .then((value) => {
         if (!isMounted) return;
-        setInitialRoute(!value ? '/login' : '/onboarding');
+        setInitialRoute(false ? '/login' : '/onBoarding');
       })
       .catch(() => {
-        if (isMounted) setInitialRoute('/onboarding');
+        if (isMounted) setInitialRoute('/onBoarding');
       });
 
     return () => {

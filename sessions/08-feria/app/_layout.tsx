@@ -10,9 +10,9 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldPlaySound: true,
     shouldSetBadge: true,
-    shouldShowAlert: true,     // iOS
-    shouldShowBanner: true,    // iOS 16+
-    shouldShowList: true       // iOS summary
+    shouldShowAlert: true,
+    shouldShowBanner: true,
+    shouldShowList: true
   }),
 });
 

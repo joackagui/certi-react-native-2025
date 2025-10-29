@@ -8,14 +8,20 @@ export default function HomeRedirect() {
 
   useEffect(() => {
     let isMounted = true;
-    AsyncStorage.getItem('hasSeenOnboarding')
-      .then((value) => {
+    const resolveRoute = async () => {
+      try {
+        const value = await AsyncStorage.getItem('hasSeenOnboarding');
         if (!isMounted) return;
-        setInitialRoute(false ? '/login' : '/onBoarding');
-      })
-      .catch(() => {
-        if (isMounted) setInitialRoute('/onBoarding');
-      });
+        setInitialRoute(value ? '/(auth)/login' : '/onBoarding');
+      } catch (error) {
+        console.warn('[Onboarding] No se pudo leer AsyncStorage, usando onboarding por defecto.', error);
+        if (isMounted) {
+          setInitialRoute('/onBoarding');
+        }
+      }
+    };
+
+    resolveRoute();
 
     return () => {
       isMounted = false;
